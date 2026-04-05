@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Plotly from "plotly.js-dist-min";
 import { ResizableWindow } from "@/components/ResizableWindow";
 import { GroupedData, SvMetrics } from "@/types/station";
-
+import euimg from "@/assets/EU.jpg";
 interface ESatelliteProps {
   visible: boolean;
   groups: GroupedData | null;
@@ -120,7 +120,14 @@ const colors = y.map((v) => {
 
   return (
     <ResizableWindow
-        title={<span className="text-xl font-bold">5. E-Satellite (Europe)</span>}
+            title={
+  <div className="flex items-center gap-2">
+    <span className="text-xl font-bold">
+      5. E-Satellite (Europe)
+    </span>
+    <img src={euimg} alt="USA" className="w-6 h-6 object-contain" />
+  </div>
+}
       id="europe"
       visible={visible}
       onClose={onClose}
