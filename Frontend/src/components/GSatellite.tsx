@@ -120,7 +120,7 @@ const colors = y.map((v) => {
 
   return (
     <ResizableWindow
-      title={<span className="text-xl font-bold">4. G-Satellite (America)</span>}
+      title={<span className="text-xl font-bold">3. G-Satellite (America)</span>}
       id="america"
       visible={visible}
       onClose={onClose}

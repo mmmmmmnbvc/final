@@ -55,7 +55,7 @@ const handleDownloadRinex = useCallback(() => {
 }, [stationName, fileSuffix, selectedDay]);
   return (
     <ResizableWindow
-      title="Data Table"
+    title={<span className="text-xl font-bold">7. Data Table</span>}
       id="table"
       visible={visible}
       onClose={onClose}

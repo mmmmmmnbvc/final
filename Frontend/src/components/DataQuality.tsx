@@ -186,7 +186,7 @@ return v >= 2000 ? "#22c55e" : v >= 1 ? "#eab308" : "#ef4444";
 
   return (
     <ResizableWindow
-      title={<span className="text-xl font-bold">7. Data Quality</span>}
+      title={<span className="text-xl font-bold">6. Data Quality</span>}
       id="dataerror"
       visible={visible}
       onClose={onClose}

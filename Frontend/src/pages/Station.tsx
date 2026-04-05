@@ -384,7 +384,7 @@ useEffect(() => {
           
             title={
   <span className="text-xl font-bold">
-    1. Station: {station?.MARKER_NAM || "Loading..."}
+    Station: {station?.MARKER_NAM || "Loading..."}
   </span>
 }
             id="info"

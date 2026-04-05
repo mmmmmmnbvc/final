@@ -85,7 +85,7 @@ export const SignalStrength = ({
 
   return (
     <ResizableWindow
-    title={<span className="text-xl font-bold">3. Signal-to-Noise Ratio</span>}
+    title={<span className="text-xl font-bold">2. Signal-to-Noise Ratio</span>}
       id="snr"
       visible={visible}
       onClose={onClose}

@@ -142,7 +142,7 @@ export const Skyplot = ({
 
   return (
     <ResizableWindow
-      title={<span className="text-xl font-bold">2. Sky Plot</span>}
+      title={<span className="text-xl font-bold">1. Sky Plot</span>}
       id="skyplot"
       visible={visible}
       onClose={onClose}
