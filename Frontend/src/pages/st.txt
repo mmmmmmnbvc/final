@@ -1,0 +1,738 @@
+import { useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/supabaseClient";
+import Papa from "papaparse";
+import Plotly from "plotly.js-dist-min";
+import { ResizableWindow } from "@/components/ResizableWindow";
+import { DashboardToolbar } from "@/components/DashboardToolbar";
+import { ChevronUp, ChevronDown, Download, Sun, Moon } from "lucide-react";
+
+// Types
+interface CsvRow {
+  time: string;
+  SV: string;
+  C1: string | number | null;
+  S1: string | number | null;
+  P2: string | number | null;
+  S2: string | number | null;
+  C2: string | number | null;
+  C5: string | number | null;
+  S5: string | number | null;
+  L1: string | number | null;
+  [key: string]: string | number | null;
+}
+
+interface SvMetrics {
+  tsec: number[];
+  C1: (number | null)[];
+  S1: (number | null)[];
+  P2: (number | null)[];
+  S2: (number | null)[];
+  C2: (number | null)[];
+  C5: (number | null)[];
+  S5: (number | null)[];
+  L1: (number | null)[];
+  doppler: (number | null)[];
+  residual: (number | null)[];
+  lock: number[];
+}
+
+interface GroupedData {
+  [group: string]: {
+    [SV: string]: SvMetrics;
+  };
+}
+
+interface StationData {
+  MARKER_NAM: string;
+  REGION: string;
+  LATITUDE: number;
+  LONGITUDE: number;
+  ELL_Height: number;
+  PROVINCE_TH?: string;
+  [key: string]: unknown;
+}
+
+interface PanelVisibility {
+  skyplot: boolean;
+  info: boolean;
+  snr: boolean;
+  america: boolean;
+  russia: boolean;
+  table: boolean;
+}
+
+// Helper functions
+const toNum = (v: string | number | null): number | null => {
+  const n = parseFloat(v as string);
+  return isNaN(n) ? null : n;
+};
+
+const rollingMedian = (arr: (number | null)[], window: number): (number | null)[] => {
+  const out: (number | null)[] = Array(arr.length).fill(null);
+  const w = Math.max(1, window | 0);
+  for (let i = 0; i < arr.length; i++) {
+    const start = Math.max(0, i - Math.floor(w / 2));
+    const end = Math.min(arr.length, start + w);
+    const slice = arr.slice(start, end).filter((x): x is number => x !== null);
+    if (slice.length > 0) {
+      const sorted = slice.slice().sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      out[i] = sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+  }
+  return out;
+};
+
+const computeMetrics = (data: CsvRow[]): GroupedData => {
+  const groups: GroupedData = {};
+  let t0: number | null = null;
+
+  data.forEach((r) => {
+    if (t0 === null) {
+      const dt = Date.parse(r.time);
+      if (!isNaN(dt)) t0 = dt / 1000.0;
+    }
+  });
+  if (t0 === null) t0 = 0;
+
+  data.forEach((r, idx) => {
+    let tsec: number | null = null;
+    const dt = Date.parse(r.time);
+    if (!isNaN(dt)) tsec = dt / 1000.0 - (t0 as number);
+    else {
+      const n = parseFloat(r.time);
+      tsec = isNaN(n) ? idx : n;
+    }
+
+    if (tsec === null) return;
+
+    const SV = (r.SV || "").toString().trim();
+    if (!SV) return;
+    const grp = SV.charAt(0) || "U";
+
+    if (!groups[grp]) groups[grp] = {};
+    if (!groups[grp][SV])
+      groups[grp][SV] = {
+        tsec: [], C1: [], S1: [], P2: [], S2: [],
+        C2: [], C5: [], S5: [], L1: [],
+        doppler: [], residual: [], lock: [],
+      };
+
+    const s = groups[grp][SV];
+    s.tsec.push(tsec);
+    s.C1.push(toNum(r.C1));
+    s.S1.push(toNum(r.S1));
+    s.P2.push(toNum(r.P2));
+    s.S2.push(toNum(r.S2));
+    s.C2.push(toNum(r.C2));
+    s.C5.push(toNum(r.C5));
+    s.S5.push(toNum(r.S5));
+    s.L1.push(toNum(r.L1));
+  });
+
+  // Doppler, Residual, Lock calculation
+  for (const grp in groups) {
+    for (const SV in groups[grp]) {
+      const s = groups[grp][SV];
+
+      s.doppler = Array(s.C1.length).fill(null);
+      for (let i = 1; i < s.C1.length; i++) {
+        const c1a = s.C1[i - 1], c1b = s.C1[i];
+        const ta = s.tsec[i - 1], tb = s.tsec[i];
+        if (c1a !== null && c1b !== null && tb > ta)
+          s.doppler[i] = -(c1b - c1a) / (tb - ta);
+      }
+
+      s.residual = Array(s.C1.length).fill(null);
+      if (s.C1.some((x) => x !== null)) {
+        const med = rollingMedian(s.C1, 5);
+        for (let i = 0; i < s.C1.length; i++)
+          if (s.C1[i] !== null && med[i] !== null)
+            s.residual[i] = (s.C1[i] as number) - (med[i] as number);
+      }
+
+      s.lock = Array(s.tsec.length).fill(0);
+      let curStart: number | null = null;
+      for (let i = 0; i < s.tsec.length; i++) {
+        const valid = s.L1[i] !== null || s.C1[i] !== null;
+        if (valid) {
+          if (curStart === null) curStart = s.tsec[i];
+          s.lock[i] = s.tsec[i] - curStart;
+        } else {
+          curStart = null;
+          s.lock[i] = 0;
+        }
+      }
+    }
+  }
+  return groups;
+};
+
+// Default window positions (grid layout)
+const DEFAULT_POSITIONS = {
+  skyplot: { x: 0, y: 0 },
+  info: { x: 550, y: 0 },
+  snr: { x: 0, y: 460 },
+  america: { x: 550, y: 460 },
+  russia: { x: 1100, y: 460 },
+  table: { x: 1100, y: 0 },
+};
+
+const DEFAULT_SIZES = {
+  skyplot: { width: 520, height: 450 },
+  info: { width: 520, height: 450 },  
+  snr: { width: 520, height: 430 },
+  america: { width: 520, height: 430 },
+  russia: { width: 520, height: 430 },
+  table: { width: 650, height: 450 },
+};
+
+export default function Station() {
+  const { stationCode } = useParams<{ stationCode: string }>();
+  const [activeMetric, setActiveMetric] = useState<string | null>(null);
+  const [station, setStation] = useState<StationData | null>(null);
+  const [uploadedData, setUploadedData] = useState<{ raw: CsvRow[] | null; groups: GroupedData | null }>({ raw: null, groups: null });
+  const [fileSuffix, setFileSuffix] = useState<string>("a");
+  const [selectedTime, setSelectedTime] = useState<string>("01:00");
+  
+
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme-mode');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  const toggleTheme = useCallback(() => {
+  setIsDarkMode(prev => {
+    const newMode = !prev;
+    localStorage.setItem('theme-mode', newMode ? 'dark' : 'light');
+    
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      if (newMode) {
+        root.classList.add('dark');
+        root.classList.remove('light'); // ต้องเอาออกเพื่อให้ตัวแปร CSS สลับ
+      } else {
+        root.classList.add('light'); // ใส่ light เข้าไปเพื่อใช้ตัวแปรสีขาว
+        root.classList.remove('dark');
+      }
+    }
+    return newMode;
+  });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [isDarkMode]);
+
+  const [visiblePanels, setVisiblePanels] = useState<PanelVisibility>({
+    skyplot: true,
+    info: true,
+    snr: true,
+    america: true,
+    russia: true,
+    table: true,
+  });
+
+  const closePanel = (id: string) => {
+    setVisiblePanels(prev => ({ ...prev, [id]: false }));
+  };
+
+  const togglePanel = (id: keyof PanelVisibility) => {
+    setVisiblePanels(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const resetAllPanels = () => {
+    setVisiblePanels({
+      skyplot: true,
+      info: true,
+      snr: true,
+      america: true,
+      russia: true,
+      table: true,
+    });
+  };
+
+  // Time options
+  const timeOptions = Array.from({ length: 26 }, (_, i) => {
+    const hour = 6 + i;
+    const suffix = String.fromCharCode("a".charCodeAt(0) + i);
+    const displayHour = hour > 23 ? hour - 24 : hour;
+    const label = `${displayHour.toString().padStart(2, "0")}:00`;
+    return { label, suffix };
+  });
+
+  const handleTimeChange = useCallback((timeValue: string) => {
+    const [h] = timeValue.split(":").map(Number);
+    let hourIndex = (h + 24 - 6) % 24;
+    if (hourIndex >= timeOptions.length) hourIndex = 0;
+    const suffix = timeOptions[hourIndex]?.suffix || "a";
+    setFileSuffix(suffix);
+    setSelectedTime(timeValue);
+  }, [timeOptions]);
+
+  const changeTime = (newHour: number, newMinute: number) => {
+    const newT = `${newHour.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}`;
+    handleTimeChange(newT);
+  };
+
+  // AutoPlay effect - continuously cycle through times
+  useEffect(() => {
+  const timer = setInterval(() => {
+    setSelectedTime(prev => {
+      const [h, m] = prev.split(":").map(Number);
+      
+      // เลือกโหมดการไหล:
+      // แบบ A: ไหลทีละ 15 นาที (เห็นความต่อเนื่องดีกว่า 1 นาที)
+      let newMinute = m + 15; 
+      let newHour = h;
+
+      if (newMinute >= 60) {
+        newMinute = 0;
+        newHour = (newHour + 1) % 24;
+      }
+
+      const newT = `${newHour.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}`;
+      
+      // ค้นหา suffix ใหม่เพื่อโหลดไฟล์ CSV ของชั่วโมงนั้นๆ
+      const hourIndex = (newHour + 24 - 6) % 24;
+      const suffix = timeOptions[hourIndex]?.suffix || "a";
+      
+      // อัปเดต state เพื่อ Trigger useEffect สำหรับ Fetch CSV
+      setFileSuffix(suffix);
+      
+      return newT;
+    });
+  }, 2500); // ไหลทุก 2.5 วินาที
+
+  return () => clearInterval(timer);
+}, [timeOptions]);
+
+  // Load station data
+  useEffect(() => {
+    const fetchStation = async () => {
+      const mockData: StationData = {
+        MARKER_NAM: stationCode || "DEMO",
+        REGION: "NT02",
+        LATITUDE: 17.896381,
+        LONGITUDE: 98.35830182,
+        ELL_Height: 755.0298,
+        PROVINCE_TH: "เชียงใหม่",
+      };
+
+      try {
+        const { data, error } = await supabase
+          .from("G")
+          .select("*")
+          .eq("MARKER_NAM", stationCode || "")
+          .single();
+
+        if (error) {
+          console.warn("Using mock data:", error.message);
+          setStation(mockData);
+        } else {
+          setStation(data as StationData);
+        }
+      } catch (e) {
+        console.error("Error fetching station:", e);
+        setStation(mockData);
+      }
+    };
+    fetchStation();
+  }, [stationCode]);
+
+  // Load CSV based on selected time
+  useEffect(() => {
+    if (!station || !fileSuffix) return;
+
+    const csvPath = `/204/${station.MARKER_NAM}204${fileSuffix}.csv`;
+
+    fetch(csvPath)
+      .then((res) => {
+        if (!res.ok) throw new Error("File not found: " + csvPath);
+        return res.text();
+      })
+      .then((csvText) => {
+        Papa.parse<CsvRow>(csvText, {
+          header: true,
+          dynamicTyping: false,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const data = results.data;
+            const groups = computeMetrics(data);
+            setUploadedData({ raw: data, groups });
+
+            if (groups) {
+              drawPolar(groups);
+              drawMiniBar("plot-G", groups["G"] || {}, "cn0");
+              drawMiniBar("plot-R", groups["R"] || {}, "cn0");
+              drawSignalStrength(groups);
+            }
+          },
+        });
+      })
+      .catch((err) => console.warn("CSV load failed:", err.message));
+  }, [station, fileSuffix]);
+
+  useEffect(() => {
+  if (!uploadedData.groups) return;
+
+  if (visiblePanels.skyplot) {
+    drawPolar(uploadedData.groups);
+  }
+
+  if (visiblePanels.america) {
+    drawMiniBar("plot-G", uploadedData.groups["G"] || {}, "cn0");
+  }
+
+  if (visiblePanels.russia) {
+    drawMiniBar("plot-R", uploadedData.groups["R"] || {}, "cn0");
+  }
+
+  if (visiblePanels.snr) {
+    drawSignalStrength(uploadedData.groups);
+  }
+}, [visiblePanels, uploadedData.groups]);
+
+  // Draw Polar Plot - NO changes to internal logic, just renders to container
+  const drawPolar = (groups: GroupedData) => {
+    const container = document.getElementById("polarPlot");
+    if (!container) return;
+
+    const traces: Plotly.Data[] = [];
+    const allSatellites: string[] = [];
+    const avgSNRValues: { [SV: string]: number } = {};
+
+    for (const grp in groups) {
+      for (const SV in groups[grp]) {
+        const SVData = groups[grp][SV];
+        const S1_data = SVData.S1.filter((v): v is number => v !== null);
+        if (S1_data.length > 0) {
+          const avgSNR = S1_data.reduce((a, b) => a + b, 0) / S1_data.length;
+          allSatellites.push(SV);
+          avgSNRValues[SV] = avgSNR;
+        }
+      }
+    }
+
+    allSatellites.forEach((SV, idx) => {
+      const avgSNR = avgSNRValues[SV];
+      const color = avgSNR >= 40 ? "#22c55e" : "#ef4444";
+
+      let r_value = (55 - avgSNR) / 25;
+      if (r_value < 0.1) r_value = 0.1;
+      if (r_value > 1) r_value = 1;
+
+      let theta_value: number;
+      switch (SV) {
+        case "G14": theta_value = 280; break;
+        case "G12": theta_value = 10; break;
+        case "R08": theta_value = 170; break;
+        case "R09": theta_value = 90; break;
+        case "G24": theta_value = 340; break;
+        default: theta_value = idx * (360 / allSatellites.length);
+      }
+
+      traces.push({
+        type: "scatterpolar",
+        r: [r_value * 10],
+        theta: [theta_value],
+        mode: "markers+text",
+        text: [SV],
+        textposition: "middle center",
+        name: SV,
+        marker: { size: 10, color },
+        hovertemplate: `SV: ${SV}<br>Avg SNR: ${avgSNR.toFixed(2)} dB-Hz<extra></extra>`
+      } as Plotly.Data);
+    });
+
+    Plotly.newPlot("polarPlot", traces, {
+      polar: {
+        radialaxis: {
+          visible: true,
+          title: "Radius (Zenith)",
+          range: [0, 10],
+          tickvals: [0, 2.5, 5, 7.5, 10],
+          autorange: false,
+          showticklabels: false,
+        },
+        angularaxis: {
+          direction: "clockwise",
+          rotation: 90,
+          tickvals: [0, 90, 180, 270],
+          ticktext: ["0°", "90°", "180°", "270°"]
+        },
+        bgcolor: "rgba(249, 250, 251, 0.5)",
+      },
+      title: "",
+      margin: { t: 20, b: 20, l: 20, r: 20 },
+      showlegend: false,
+      autosize: true,
+    } as Partial<Plotly.Layout>, { responsive: true, displayModeBar: false });
+  };
+
+  // Draw MiniBar - NO changes to internal logic
+  const drawMiniBar = (plotId: string, groupData: { [SV: string]: SvMetrics }, metric: keyof SvMetrics | "cn0" | "psr") => {
+    const SVs = Object.keys(groupData).sort();
+    const traces: Plotly.Data[] = [];
+
+    const getLast = (arr: (number | null)[]): number => arr.slice().reverse().find((v): v is number => v !== null) ?? 0;
+
+    if (SVs.length === 0) {
+      Plotly.react(plotId, traces, {
+        margin: { t: 10, b: 40, l: 30, r: 10 },
+        showlegend: false,
+        yaxis: { title: "", range: [0, 65], showticklabels: false, fixedrange: true },
+        autosize: true,
+      } as Partial<Plotly.Layout>, { responsive: true, displayModeBar: false });
+      return;
+    }
+
+    const x = SVs;
+    const barColors: Record<string, string> = {
+      cn0: "#3b82f6",
+      psr: "#06b6d4",
+      doppler: "#a855f7",
+      residual: "#ef4444",
+      lock: "#ec4899",
+    };
+
+    let y: number[] = [];
+    if (metric === "cn0") {
+      y = SVs.map((SV) => getLast(groupData[SV].S1));
+    } else if (metric === "psr") {
+      y = SVs.map((SV) => getLast(groupData[SV].C1));
+    } else if (metric === "doppler") {
+      y = SVs.map((SV) => getLast(groupData[SV].doppler));
+    } else if (metric === "residual") {
+      y = SVs.map((SV) => getLast(groupData[SV].residual));
+    } else if (metric === "lock") {
+      y = SVs.map((SV) => getLast(groupData[SV].lock));
+    }
+
+    traces.push({
+      x,
+      y,
+      name: metric.toString().toUpperCase(),
+      type: "bar",
+      marker: { color: barColors[metric] || "#3b82f6" }
+    });
+
+    Plotly.react(plotId, traces, {
+      barmode: "group",
+      margin: { t: 10, b: 40, l: 30, r: 10 },
+      showlegend: false,
+      yaxis: { title: "", showticklabels: false, fixedrange: true },
+      xaxis: { showgrid: false, tickangle: -45 },
+      autosize: true,
+    } as Partial<Plotly.Layout>, { responsive: true, displayModeBar: false });
+  };
+
+  // Draw Signal Strength - NO changes to internal logic
+const drawSignalStrength = (groups: GroupedData) => {
+  const container = document.getElementById("signalStrengthPlot");
+  if (!container) return;
+
+  const dataPoints: { sv: string; avg: number }[] = [];
+
+  // รวบรวมข้อมูลและหาค่าเฉลี่ย
+  for (const grp in groups) {
+    for (const SV in groups[grp]) {
+      const sData = groups[grp][SV];
+      const validS1 = sData.S1.filter((v): v is number => v !== null);
+      if (validS1.length > 0) {
+        const avg = validS1.reduce((a, b) => a + b, 0) / validS1.length;
+        dataPoints.push({ sv: SV, avg });
+      }
+    }
+  }
+
+  // เรียงลำดับชื่อดาวเทียมให้เป็นระเบียบ (G01, G02, ..., R01)
+  dataPoints.sort((a, b) => a.sv.localeCompare(b.sv, undefined, { numeric: true, sensitivity: 'base' }));
+
+  const x = dataPoints.map(d => d.sv);
+  const y = dataPoints.map(d => d.avg);
+  
+  // ปรับ Threshold สี: เขียว (>40), เหลือง (30-40), แดง (<30)
+  const colors = y.map(snr => (snr >= 40 ? "#22c55e" : snr >= 30 ? "#eab308" : "#ef4444"));
+
+  const trace: Plotly.Data = {
+    x,
+    y,
+    type: "bar",
+    marker: { 
+      color: colors,
+      line: { width: 1, color: 'rgba(0,0,0,0.1)' }
+    },
+    hovertemplate: "<b>%{x}</b><br>Avg SNR: %{y:.1f} dB-Hz<extra></extra>",
+  };
+
+  const layout: Partial<Plotly.Layout> = {
+    margin: { t: 10, b: 40, l: 40, r: 10 },
+    font: { size: 11 },
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    xaxis: { 
+      showgrid: false, 
+      tickangle: -45, 
+      automargin: true 
+    },
+    yaxis: { 
+      title: "dB-Hz", 
+      range: [0, 60], 
+      gridcolor: "rgba(0,0,0,0.05)",
+      zeroline: false 
+    },
+    autosize: true,
+  };
+
+  // ใช้ react แทน newPlot เพื่อประสิทธิภาพในการอัปเดตต่อเนื่อง
+  Plotly.react("signalStrengthPlot", [trace], layout, { responsive: true, displayModeBar: false });
+};
+
+  // Download CSV
+  const handleDownloadCSV = () => {
+    if (!uploadedData.raw) {
+      alert("No CSV data loaded");
+      return;
+    }
+    const csv = Papa.unparse(uploadedData.raw);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${station?.MARKER_NAM || "station"}_204${fileSuffix}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (!station) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-foreground text-lg">⏳ Loading station data...</div>
+      </div>
+    );
+  }
+
+  const [currentHour, currentMinute] = selectedTime.split(":").map(Number);
+  const period = currentHour >= 12 ? "PM" : "AM";
+  const imageDisplayHour = (currentHour % 12 || 12).toString().padStart(2, "0");
+
+  const metricButtons = ["cn0", "psr", "doppler", "residual", "lock"] as const;
+
+  return (
+    <div className="min-h-screen bg-background p-4" style={{ position: 'relative', overflow: 'hidden' }}>
+
+
+
+
+        {/* Signal Strength (SNR) Window */}
+<ResizableWindow
+  title="Signal-to-Noise Ratio (Average S1)"
+  id="snr"
+  visible={visiblePanels.snr}
+  onClose={closePanel}
+  defaultPosition={DEFAULT_POSITIONS.snr}
+  defaultSize={DEFAULT_SIZES.snr}
+>
+  <div className="p-3 h-full flex flex-col bg-card/50">
+    {/* กราฟหลัก */}
+    <div id="signalStrengthPlot" className="flex-1 w-full min-h-[200px]" />
+    
+    {/* Legend คำอธิบายสี */}
+    <div className="flex justify-center items-center gap-6 mt-2 py-2 border-t border-border/50 text-[10px] font-medium uppercase tracking-wider">
+      <div className="flex items-center gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm" />
+        <span className="text-muted-foreground">Excellent (40-99)</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm" />
+        <span className="text-muted-foreground">Good (30-40)</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" />
+        <span className="text-muted-foreground">Weak (0-30)</span>
+      </div>
+    </div>
+  </div>
+</ResizableWindow>
+
+        {/* America (G) Satellite Window */}
+        <ResizableWindow
+          title="G-Satellite (America)"
+          id="america"
+          visible={visiblePanels.america}
+          onClose={closePanel}
+          defaultPosition={DEFAULT_POSITIONS.america}
+          defaultSize={DEFAULT_SIZES.america}
+        >
+          <div className="p-3 h-full flex flex-col">
+            <div className="flex gap-1 mb-2 flex-wrap">
+              {metricButtons.map((metric) => (
+                <button
+                  key={metric}
+                  onClick={() => {
+                    drawMiniBar("plot-G", uploadedData.groups?.["G"] || {}, metric);
+                    setActiveMetric(`${metric}-G`);
+                  }}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                    activeMetric === `${metric}-G`
+                      ? "bg-secondary text-secondary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {metric.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <div id="plot-G" className="flex-1 w-full" />
+          </div>
+        </ResizableWindow>
+
+        {/* Russia (R) Satellite Window */}
+        <ResizableWindow
+          title="R-Satellite (Russia)"
+          id="russia"
+          visible={visiblePanels.russia}
+          onClose={closePanel}
+          defaultPosition={DEFAULT_POSITIONS.russia}
+          defaultSize={DEFAULT_SIZES.russia}
+        >
+          <div className="p-3 h-full flex flex-col">
+            <div className="flex gap-1 mb-2 flex-wrap">
+              {metricButtons.map((metric) => (
+                <button
+                  key={metric}
+                  onClick={() => {
+                    drawMiniBar("plot-R", uploadedData.groups?.["R"] || {}, metric);
+                    setActiveMetric(`${metric}-R`);
+                  }}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                    activeMetric === `${metric}-R`
+                      ? "bg-secondary text-secondary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {metric.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <div id="plot-R" className="flex-1 w-full" />
+          </div>
+        </ResizableWindow>
+
+        
+ 
+    </div>
+  );
+}

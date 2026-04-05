@@ -1,0 +1,39 @@
+.windy-label {
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  pointer-events: none;
+  background: transparent;
+}
+
+.leaflet-marker-icon.windy-label {
+  background: transparent !important;
+  border: none !important;
+}
+.map-top-overlay {
+  position: absolute;
+  top: 12px;
+  left: 1000px;
+  z-index: 1200; /* สูงกว่า map */
+  pointer-events: none; /* ไม่บังการลาก map */
+}
+
+.windy-like-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  border-radius: 9999px; */
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.windy-like-brand img {
+  width: 22px;
+  height: 22px;
+}
