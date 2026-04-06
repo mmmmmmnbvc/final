@@ -477,7 +477,7 @@ useEffect(() => {
 
     const autocomplete = new window.google.maps.places.Autocomplete(input);
 
-      autocomplete.addListener("place_changed", () => {
+  autocomplete.addListener("place_changed", () => {
   const place = autocomplete.getPlace();
   if (!place.geometry) return;
 

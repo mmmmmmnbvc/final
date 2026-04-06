@@ -3,8 +3,7 @@ import argparse
 import pandas as pd
 from pathlib import Path
 from multiprocessing import Pool, cpu_count
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
+
 SUPPORTED_EXT = ".25o"
 DEBUG = False  # 🔥 ปิด log เพื่อความเร็ว
 
@@ -54,7 +53,42 @@ def extract_obs_types(lines):
 
 
 # =========================
-# CORE PARSER (SAFE + FAST)
+# FORMAT TIME (🔥 แก้ตรงนี้)
+# =========================
+def format_time(parts):
+    try:
+        year = int(parts[1])
+        month = int(parts[2])
+        day = int(parts[3])
+
+        hour = int(parts[4])
+        minute = int(parts[5])
+
+        # 🔥 ตัดทศนิยม + ปัดวินาที
+        second = int(round(float(parts[6])))
+
+        # 🔥 handle overflow เช่น 59.999999 → 60
+        if second == 60:
+            second = 0
+            minute += 1
+
+        if minute == 60:
+            minute = 0
+            hour += 1
+
+        if hour == 24:
+            hour = 0
+            day += 1
+
+        # 🔥 format: 2025-12-5 18:59:59
+        return f"{year}-{month}-{day} {hour:02}:{minute:02}:{second:02}"
+
+    except:
+        return None
+
+
+# =========================
+# CORE PARSER
 # =========================
 def parse_rinex(file_path):
     with open(file_path, 'r', encoding='latin-1', errors='ignore') as f:
@@ -71,10 +105,7 @@ def parse_rinex(file_path):
         # ===== EPOCH =====
         if line.startswith(">"):
             p = line.split()
-            try:
-                current_time = f"{p[1]}-{p[2]}-{p[3]} {p[4]}:{p[5]}:{p[6]}"
-            except:
-                current_time = None
+            current_time = format_time(p)  # 🔥 ใช้ function ใหม่
             i += 1
             continue
 
@@ -102,7 +133,6 @@ def parse_rinex(file_path):
         values.extend([chunk[j:j+16].strip() for j in range(0, len(chunk), 16)])
         i += 1
 
-        # 🔥 SAFE continuation (ไม่ข้าม epoch)
         while len(values) < expected_len and i < len(lines):
             next_line = lines[i]
 
@@ -174,26 +204,25 @@ def process_file(file_path):
     if df.empty:
         return
 
-    # 🔥 faster csv write
     df.to_csv(output_path, index=False, float_format="%.6f")
 
     if DEBUG:
-        print(f"[DONE] {output_path} rows={len(df)} - etl_gnss.py:180")
+        print(f"[DONE] {output_path} rows={len(df)} - etl_gnss.py:210")
 
 
 # =========================
-# BULK (MULTIPROCESS)
+# BULK
 # =========================
 def bulk_run(root_folder):
     files = list(Path(root_folder).rglob(f"*{SUPPORTED_EXT}"))
 
-    print(f"แปลงข้อมูลแล้ว {len(files)} ไฟล์")
+    print(f"[FOUND] {len(files)} files - etl_gnss.py:219")
 
     if not files:
         return
 
     workers = min(cpu_count(), len(files))
-    # print(f"[USING {workers} CORES] - etl_gnss.py:195")
+    print(f"[USING {workers} CORES] - etl_gnss.py:225")
 
     with Pool(workers) as p:
         p.map(process_file, [str(f) for f in files])
@@ -211,7 +240,7 @@ def main():
     if args.bulk:
         bulk_run(args.bulk)
     else:
-        print("Usage: python  bulk 2025 - etl_gnss.py:213")
+        print("Usage: python  bulk <folder> - etl_gnss.py:243")
 
 
 if __name__ == "__main__":

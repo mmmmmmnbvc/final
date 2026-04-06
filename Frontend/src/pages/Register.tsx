@@ -35,6 +35,7 @@ const Register = () => {
     const { error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
+      status: "USER",
       options: {
         // เก็บ username เพื่อใช้ตอน Verify
         data: { username: formData.username ,password: formData.password }, 
