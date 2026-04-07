@@ -121,6 +121,33 @@ app.post('/api/convert', express.json(), (req, res) => {
 });
 
 // ============================
+// 📁 POST: create folder
+// ============================
+app.post('/api/create-folder', express.json(), (req, res) => {
+  const { folder, name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'name is required' });
+  }
+
+  const targetPath = path.join(FRONTEND_PUBLIC, folder || '', name);
+
+  try {
+    if (!fs.existsSync(targetPath)) {
+      fs.mkdirSync(targetPath, { recursive: true });
+    }
+
+    res.json({
+      success: true,
+      folder: name
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'create folder failed' });
+  }
+});
+// ============================
 // 🚀 Start Server
 // ============================
 app.listen(4000, () => {

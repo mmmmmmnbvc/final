@@ -99,14 +99,19 @@ const FolderSidebar = ({
 
 
 
-  const handleCreate = () => {
-    if (!newFolderName.trim()) return;
-    const path = currentFolder + '/' + newFolderName.trim();
-    onCreateFolder(path);
-    setNewFolderName('');
-    setShowNewFolder(false);
-    onFolderSelect(path);
-  };
+const handleCreate = () => {
+  if (!newFolderName.trim()) return;
+
+  const name = newFolderName.trim();
+
+  onCreateFolder(name); // ✅ ส่งแค่ชื่อ
+
+  const newPath = currentFolder + '/' + name;
+
+  setNewFolderName('');
+  setShowNewFolder(false);
+  onFolderSelect(newPath);
+};
 
   if (collapsed) {
     return (

@@ -16,7 +16,7 @@ export const useFileManager = () => {
   const [folders, setFolders] = useState<string[]>([]);
 const [filesInFolder, setFilesInFolder] = useState<FileItem[]>([]); 
 
-  const [currentFolder, setCurrentFolder] = useState('/2568/');
+  const [currentFolder, setCurrentFolder] = useState('/');
 
 useEffect(() => {
   fetch('http://localhost:4000/api/folders')
@@ -120,6 +120,23 @@ const addFiles = useCallback(async (files: File[]) => {
   );
 
 }, [currentFolder]);
+
+const createFolder = useCallback(async (name: string, root = false) => {
+  const folderPath = root
+    ? "" 
+    : currentFolder.replace(/\//g, '');
+
+  await fetch("http://localhost:4000/api/create-folder", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      folder: folderPath,
+      name,
+    }),
+  });
+}, [currentFolder]);
 return {
   files: folders,          // sidebar
   filesInFolder,           // กลางจอ
@@ -128,7 +145,7 @@ return {
   addFiles,
   deleteFile,              // ✅ ใส่ของจริง
   deleteAll,               // ✅ ใส่ของจริง
-  createFolder: () => {},
+  createFolder,
 };
 
 
