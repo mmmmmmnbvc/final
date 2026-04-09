@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
+import { X, Square, Maximize2, Minimize2 } from "lucide-react";
 
 interface ResizableWindowProps {
   title: React.ReactNode;
@@ -145,7 +145,7 @@ export const ResizableWindow = ({
               className="p-1.5 rounded-md hover:bg-muted transition-colors"
               title="Reset size and position"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-muted-foreground" />
+              <Square className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
             <button
               onClick={toggleMinimize}

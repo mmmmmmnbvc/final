@@ -104,13 +104,11 @@ const handleCreate = () => {
 
   const name = newFolderName.trim();
 
-  onCreateFolder(name); // ✅ ส่งแค่ชื่อ
-
-  const newPath = currentFolder + '/' + name;
+  // 🔥 ถ้าอยากให้สร้าง root
+  onCreateFolder(name, true);
 
   setNewFolderName('');
   setShowNewFolder(false);
-  onFolderSelect(newPath);
 };
 
   if (collapsed) {
@@ -146,7 +144,7 @@ const handleCreate = () => {
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-sidebar-border px-3 py-3">
-        <h2 className="text-sm font-semibold text-sidebar-foreground">โฟลเดอร์</h2>
+        <h2 className="text-xl font-semibold text-sidebar-foreground">โฟลเดอร์</h2>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -176,10 +174,10 @@ const handleCreate = () => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden border-b border-sidebar-border px-3 py-2"
           >
-            <p className="mb-1 text-xs text-muted-foreground">
+            <p className="mb-1 text-xl text-muted-foreground">
               สร้างใน: {currentFolder}
             </p>
-            <div className="flex gap-1">
+            <div className="flex gap-1 ">
               <Input
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}

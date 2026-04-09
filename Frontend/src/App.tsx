@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-import Dashboard from "./pages/Dashboard";
+
 import NotFound from "./pages/NotFound";
 import Map from "./pages/Map";
 import Home from "./pages/Home";
@@ -55,7 +55,7 @@ const App = () => {
             <Route path="/Login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+
             <Route path="/Upload" element={<Upload />} />
             <Route path="/Updates" element={<Updates />} />
             <Route path="/ResetPassword" element={<ResetPassword />} />

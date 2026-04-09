@@ -20,8 +20,9 @@ interface DashboardToolbarProps {
 }
 
 const panels: { id: keyof PanelVisibility; label: string }[] = [
-  { id: 'skyplot', label: 'Sky Plot' },
   { id: 'info', label: 'Station' },
+  { id: 'skyplot', label: 'Sky Plot' },
+
   { id: 'snr', label: 'SNR' },
   { id: 'america', label: 'G-Satellite' },
   { id: 'russia', label: 'R-Satellite' },
@@ -41,7 +42,7 @@ export const DashboardToolbar = ({
     <div className="flex items-center gap-2 px-4 py-3 bg-card/50 backdrop-blur-sm rounded-lg border border-border mb-4">
       <button
         onClick={toggleTheme}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xl font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all"
         title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
       >
         {isDarkMode ? (
@@ -51,14 +52,14 @@ export const DashboardToolbar = ({
         )}
       </button>
       
-      <span className="text-sm font-medium text-muted-foreground mr-2">Windows:</span>
+      <span className="text-xl font-medium text-muted-foreground mr-2">Windows:</span>
       
       {panels.map(({ id, label }) => (
         <button
           key={id}
           onClick={() => togglePanel(id)}
           className={`
-            flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all
+            flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xl font-medium transition-all
             ${visiblePanels[id] 
               ? 'bg-primary text-primary-foreground' 
               : 'bg-muted text-muted-foreground hover:bg-muted/80'
@@ -78,7 +79,7 @@ export const DashboardToolbar = ({
       
       <button
         onClick={resetAllPanels}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xl font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all"
       >
         <RotateCcw className="w-3 h-3" />
         Reset All

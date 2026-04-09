@@ -9,7 +9,7 @@ import StatsBar from '@/components/StatsBar';
 import FolderSidebar from '@/components/FolderSidebar';
 import { Button } from '@/components/ui/button';
 import { ROOT_FOLDER } from '@/lib/file-utils';
-
+import { useEffect } from "react";
 const Updates = () => {
   const {
     files,
@@ -24,7 +24,15 @@ const Updates = () => {
 
   // Breadcrumb parts
   const breadcrumbParts = currentFolder.split('/').filter(Boolean);
+   useEffect(() => {
+    // เปิด Light Mode ตอนเข้า page
+    document.documentElement.classList.add("station-light");
 
+    // ลบออกตอนออกจาก page (สำคัญมาก)
+    return () => {
+      document.documentElement.classList.remove("station-light");
+    };
+  }, []);
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
@@ -49,8 +57,8 @@ const Updates = () => {
                 <FolderOpen className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">จัดการไฟล์</h1>
-                <p className="text-sm text-muted-foreground">เพิ่ม ลบ และดูรายการไฟล์ตามโฟลเดอร์</p>
+                <h1 className="text-xl font-bold text-foreground">จัดการไฟล์</h1>
+                <p className="text-xl text-muted-foreground">เพิ่ม ลบ และดูรายการไฟล์ตามโฟลเดอร์</p>
               </div>
             </div>
             {filesInFolder.length > 0 && (
@@ -58,9 +66,9 @@ const Updates = () => {
                 variant="outline"
                 size="sm"
                 onClick={deleteAll}
-                className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+                className="gap-1.5 text-destructive text-xl border-destructive/30 hover:bg-destructive/10"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4 " />
                 ลบทั้งหมด
               </Button>
             )}
@@ -90,7 +98,7 @@ const Updates = () => {
       alert("❌ แปลงไม่สำเร็จ");
     }
   }}
-  className="gap-1.5 text-sky-600 border-sky-600 hover:bg-destructive/10"
+  className="gap-1.5 text-sky-600 border-sky-600 hover:bg-destructive/10 text-xl"
 >
   {/* <Trash2 className="h-4 w-4" /> */}
   แปลงข้อมูลเป็น CSV

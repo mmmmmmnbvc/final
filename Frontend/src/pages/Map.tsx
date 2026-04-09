@@ -117,7 +117,7 @@ window.windyInit(
     // ✅ แก้ปัญหา map ขนาดผิด
     setTimeout(() => {
       map.invalidateSize();
-    }, 400);
+    }, 1000);
 
     const L = window.L;
     if (!L) return;
@@ -373,7 +373,7 @@ return (
         position: "absolute",
         inset: 0,
         zIndex: 0,
-        visibility: "hidden",
+        visibility: "visible",
 pointerEvents: "none"
 
       }}
@@ -475,7 +475,7 @@ useEffect(() => {
 
     if (!input || !window.google) return;
 
-    const autocomplete = new window.google.maps.places.Autocomplete(input);
+  const autocomplete = new window.google.maps.places.Autocomplete(input);
 
   autocomplete.addListener("place_changed", () => {
   const place = autocomplete.getPlace();

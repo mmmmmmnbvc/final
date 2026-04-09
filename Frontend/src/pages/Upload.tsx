@@ -94,7 +94,15 @@ const handleUpdate = async (
 };
 
   const nextNo = data.length > 0 ? Math.max(...data.map((d) => d.no)) + 1 : 1;
+   useEffect(() => {
+    // เปิด Light Mode ตอนเข้า page
+    document.documentElement.classList.add("station-light");
 
+    // ลบออกตอนออกจาก page (สำคัญมาก)
+    return () => {
+      document.documentElement.classList.remove("station-light");
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

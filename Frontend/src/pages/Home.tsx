@@ -4,8 +4,17 @@ import { Map, Database, Shield, Zap } from "lucide-react";
 import hiiLogo from "@/assets/hii-logo.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroBgs from "@/assets/1758772306473-removebg-preview.png";
-
+import { useEffect } from "react";
 const Index = () => {
+    useEffect(() => {
+      // เปิด Light Mode ตอนเข้า page
+      document.documentElement.classList.add("station-light");
+
+      // ลบออกตอนออกจาก page (สำคัญมาก)
+      return () => {
+        document.documentElement.classList.remove("station-light");
+      };
+    }, []);
   return (
     <div 
       className="min-h-screen relative"
@@ -15,7 +24,7 @@ const Index = () => {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-background/50 backdrop-blur-sm" />
+      <div className="absolute inset-0  backdrop-blur-sm" />
       
       <div className="relative z-10">
   <header className="container mx-auto px-4 py-10"> 

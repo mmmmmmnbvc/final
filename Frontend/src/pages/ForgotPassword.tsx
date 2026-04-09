@@ -84,7 +84,15 @@ const ForgotPassword = () => {
     alert("Password updated successfully!");
     window.location.href = "/login";
   };
+    useEffect(() => {
+      // เปิด Light Mode ตอนเข้า page
+      document.documentElement.classList.add("station-light");
 
+      // ลบออกตอนออกจาก page (สำคัญมาก)
+      return () => {
+        document.documentElement.classList.remove("station-light");
+      };
+    }, []);
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
@@ -94,7 +102,7 @@ const ForgotPassword = () => {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+      <div className="absolute inset-0  backdrop-blur-sm" />
 
       <div className="relative z-10">
         <AuthCard

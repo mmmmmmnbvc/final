@@ -58,7 +58,15 @@ const ResetPassword = () => {
     alert("Password updated successfully!");
     navigate("/login");
   };
+    useEffect(() => {
+      // เปิด Light Mode ตอนเข้า page
+      document.documentElement.classList.add("station-light");
 
+      // ลบออกตอนออกจาก page (สำคัญมาก)
+      return () => {
+        document.documentElement.classList.remove("station-light");
+      };
+    }, []);
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"

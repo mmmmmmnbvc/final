@@ -8,7 +8,7 @@ import { User, Mail, Lock, Chrome, Check } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { supabase } from "@/supabaseClient";
 
-
+import { useEffect } from "react";
 const REDIRECT_URL = 'http://localhost:8080/verify'; 
 
 const Register = () => {
@@ -75,7 +75,15 @@ const Register = () => {
 
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 
+    useEffect(() => {
+      // เปิด Light Mode ตอนเข้า page
+      document.documentElement.classList.add("station-light");
 
+      // ลบออกตอนออกจาก page (สำคัญมาก)
+      return () => {
+        document.documentElement.classList.remove("station-light");
+      };
+    }, []);
   return (
     <div 
       className="min-h-screen flex items-center justify-center p-4 relative"
@@ -85,7 +93,7 @@ const Register = () => {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+      <div className="absolute inset-0  backdrop-blur-sm" />
       
       <div className="relative z-10">
         <AuthCard title="Create Account">

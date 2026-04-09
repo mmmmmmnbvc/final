@@ -34,6 +34,7 @@
 
   export default function Station() {
     const { stationCode } = useParams<{ stationCode: string }>();
+const [isCsvLoaded, setIsCsvLoaded] = useState(false);
 
     const [selectedConstellation, setSelectedConstellation] = useState<"G" | "R" | "E">("G");
     const [skyConstellation, setSkyConstellation] =
@@ -42,6 +43,8 @@
     const [uploadedData, setUploadedData] = useState<{ raw: CsvRow[] | null; groups: GroupedData | null }>({ raw: null, groups: null });
     const [metricSatellite, setMetricSatellite] = useState("cn0")
   const [metricDataQuality, setMetricDataQuality] = useState("doppler")
+   const [isPlaying, setIsPlaying] = useState(true);
+  const canPlay = isPlaying && isCsvLoaded && !!uploadedData.raw;
   // ✅ ADD ตรงนี้
 const [realTimePosition, setRealTimePosition] = useState<{
   lat: number;
@@ -56,7 +59,7 @@ const [positionError, setPositionError] = useState<number | null>(null);
     R: Object.keys(uploadedData.groups?.["R"] || {}).length,
     E: Object.keys(uploadedData.groups?.["E"] || {}).length,
     };
-  const [isPlaying, setIsPlaying] = useState(true);
+ 
     const totalSatellites =
       satelliteCounts.G + satelliteCounts.R + satelliteCounts.E;
 
@@ -168,7 +171,11 @@ const [positionError, setPositionError] = useState<number | null>(null);
 
     handleTimeChange(newT);
   };
+const BASE_WIDTH = 3840;
+const BASE_HEIGHT = 2160;
 
+const scaleX = (px: number) => (window.innerWidth / BASE_WIDTH) * px;
+const scaleY = (px: number) => (window.innerHeight / BASE_HEIGHT) * px;
   useEffect(() => {
     fetch("/day.json")
       .then((res) => res.json())
@@ -184,44 +191,42 @@ const [positionError, setPositionError] = useState<number | null>(null);
   }, []);
 
     // AutoPlay effect - continuously cycle through times
-  useEffect(() => {
-      if (!uploadedData.raw || !isPlaying) return;
+useEffect(() => {
+  if (!canPlay) {
+    return; // React จะ cleanup timer เดิมให้อยู่แล้ว
+  }
 
-      const timer = setInterval(() => {
-        setSelectedTime((prevTime) => {
-          // Extract current time components
-          const [currentH, currentM, currentS] = prevTime.split(":").map(Number);
+  const timer = setInterval(() => {
+    setSelectedTime((prevTime) => {
+      const [h, m, s] = prevTime.split(":").map(Number);
 
-          // Increment seconds
-          let newH = currentH;
-          let newM = currentM;
-          let newS = currentS + 1;
+      let newS = s + 1;
+      let newM = m;
+      let newH = h;
 
-          // Handle second overflow
-          if (newS >= 60) {
-            newS = 0;
-            newM = currentM + 1;
+      if (newS >= 60) {
+        newS = 0;
+        newM++;
+        if (newM >= 60) {
+          newM = 0;
+          newH = (newH + 1) % 24;
+        }
+      }
 
-            // Handle minute overflow
-            if (newM >= 60) {
-              newM = 0;
-              newH = (currentH + 1) % 24;
-            }
-          }
+      return `${newH.toString().padStart(2, "0")}:` +
+             `${newM.toString().padStart(2, "0")}:` +
+             `${newS.toString().padStart(2, "0")}`;
+    });
+  }, 1000);
 
-          const newTime =
-            `${newH.toString().padStart(2, "0")}:` +
-            `${newM.toString().padStart(2, "0")}:` +
-            `${newS.toString().padStart(2, "0")}`;
+  return () => clearInterval(timer);
+}, [canPlay]);
 
-          return newTime;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-
-    }, [uploadedData.raw, isPlaying]);
-
+useEffect(() => {
+  if (!isCsvLoaded) {
+    setIsPlaying(false);
+  }
+}, [isCsvLoaded]);
     // Monitor selectedTime changes during autoplay and update fileSuffix when hour changes
     useEffect(() => {
       if (!isPlaying) return;
@@ -280,6 +285,13 @@ const [positionError, setPositionError] = useState<number | null>(null);
     // Load CSV based on selected time
     useEffect(() => {
       if (!station || !fileSuffix) return;
+      if (!availableDays.includes(selectedDay)) {
+    console.warn("❌ No CSV for this day");
+    setUploadedData({ raw: null, groups: null });
+    setIsCsvLoaded(false);
+    setIsPlaying(false);
+    return;
+  }
 
       const csvPath = `/${selectedDay}/${station.MARKER_NAM}${selectedDay}${fileSuffix}.csv`;
 
@@ -288,19 +300,25 @@ const [positionError, setPositionError] = useState<number | null>(null);
           if (!res.ok) throw new Error("File not found: " + csvPath);
           return res.text();
         })
-        .then((csvText) => {
-          Papa.parse<CsvRow>(csvText, {
-            header: true,
-            dynamicTyping: false,
-            skipEmptyLines: true,
-            complete: (results) => {
-              const data = results.data;
-              const groups = computeMetrics(data);
-              setUploadedData({ raw: data, groups });
-            },
-          });
-        })
-        .catch((err) => console.warn("CSV load failed:", err.message));
+.then((csvText) => {
+  Papa.parse<CsvRow>(csvText, {
+    header: true,
+    complete: (results) => {
+      const data = results.data;
+      const groups = computeMetrics(data);
+      setUploadedData({ raw: data, groups });
+
+      setIsCsvLoaded(true); // ✅ โหลดเสร็จ
+    },
+  });
+})
+.catch((err) => {
+  console.warn("CSV load failed:", err.message);
+
+  setUploadedData({ raw: null, groups: null }); // 🔥 ตัวแก้หลัก
+  setIsCsvLoaded(false);
+  setIsPlaying(false); // (แนะนำ) หยุดเลย
+});
     }, [station, fileSuffix, selectedDay]);
 // ✅ position real time
 useEffect(() => {
@@ -392,7 +410,8 @@ useEffect(() => {
             onClose={closePanel}
             // position size
             defaultPosition={{ x: 0, y: 0 }}
-            defaultSize={{ width: 650, height: 580 }}
+            defaultSize={{ width: 450, height: 430 }}
+            
           >
             <div className="p-4 space-y-4 overflow-auto h-full text-xl">
               <div className="space-y-2 ">
@@ -465,10 +484,12 @@ useEffect(() => {
                 <input
                   type="date"
                   className=" text-xl px-2 py-1  rounded border border-border bg-secondary text-primary"
-                  onChange={(e) => {
-                    const date = new Date(e.target.value);
-                    setSelectedDate(date);
-                  }}
+onChange={(e) => {
+  const date = new Date(e.target.value);
+  const day = getDayOfYear(date);
+
+  setSelectedDate(date);
+}}
                 />
               </div>
 
@@ -577,11 +598,11 @@ useEffect(() => {
                   </div>
 
                   {/* AM/PM */}
-                  <div className="flex flex-col gap-1 ml-2">
+                  <div className="flex flex-col gap-1 ml-2 ">
 
                     <button
                       onClick={() => setIsPlaying((p) => !p)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                      className={`px-3 py-1 rounded text-xl font-medium transition-all ${
                         isPlaying
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted text-muted-foreground"
@@ -613,6 +634,7 @@ useEffect(() => {
             onMetricChange={setMetricSatellite}
             onClose={closePanel}
             onToggleMinimize={() => {}}
+            
           />
 
           {/* R-Satellite Component */}

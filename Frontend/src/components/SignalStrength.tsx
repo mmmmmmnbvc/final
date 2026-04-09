@@ -11,8 +11,8 @@ interface SignalStrengthProps {
   onToggleMinimize: (isMinimized: boolean) => void;
 }
 
-const DEFAULT_POSITION = { x: 1340, y: 0 };//1720
-const DEFAULT_SIZE = { width: 650, height: 580 };
+const DEFAULT_POSITION = { x: 940, y: 0 };//1720
+const DEFAULT_SIZE = { width: 450, height: 430 };
 
 export const SignalStrength = ({
   visible,
@@ -49,7 +49,7 @@ export const SignalStrength = ({
       x: SVs,
       y: values,
       type: "bar",
-      text: SVs,
+
       textposition: "outside",
       marker: { color: colors },
       hovertemplate: "<b>%{x}</b><br>SNR %{y}<extra></extra>",
@@ -62,15 +62,15 @@ export const SignalStrength = ({
         margin: { t: 30, b: 40, l: 40, r: 10 },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
-        yaxis: {
-          title: "dB-Hz",
-          range: [0, 65],
-          fixedrange: true,
-        },
-        xaxis: {
-          tickangle: -45,
-          fixedrange: true,
-        },
+        // yaxis: {
+        //   title: "dB-Hz",
+        //   range: [0, 65],
+        //   fixedrange: true,
+        // },
+        // xaxis: {
+        //   tickangle: -45,
+        //   fixedrange: true,
+        // },
         autosize: true,
       },
       { responsive: true, displayModeBar: false }

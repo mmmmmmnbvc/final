@@ -13,8 +13,8 @@ interface GSatelliteProps {
   onToggleMinimize: (isMinimized: boolean) => void;
 }
 
-const DEFAULT_POSITION = { x: 2012, y: 0 }; //y: 520
-const DEFAULT_SIZE = { width: 650, height: 580 };
+const DEFAULT_POSITION = { x: 1410, y: 0 }; //y: 520
+const DEFAULT_SIZE = { width: 450, height: 430 };
 const metricButtons = ["cn0", "psr"] as const;
 
 export const GSatellite = ({
@@ -140,22 +140,37 @@ const colors = y.map((v) => {
           {metricButtons.map((metric) => (
             <button
               key={metric}
-              onClick={() => {
-                drawMiniBar("plot-G", groups?.["G"] || {}, metric);
-                onMetricChange(metric);
-              }}
-              className={`px-3 py-1 text-xl rounded-md border border-border transition ${
-                metricSatellite === metric
-                  ? "bg-secondary text-primary"
-                  : "bg-secondary/60 text-primary hover:bg-secondary"
-              }`}
+onClick={() => onMetricChange(metric)}
+className={`px-3 py-1 text-xl rounded-md border transition ${
+  metricSatellite === metric
+    ? "bg-blue-500 text-white border-blue-500"
+    : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+}`}
             >
               {metric.toUpperCase()}
             </button>
           ))}
+          
         </div>
         <div id="plot-G" className="flex-1 w-full" />
+
+<div className="flex justify-center items-center gap-6 mt-2 py-2 border-t border-border/50 text-xl font-medium uppercase tracking-wider">
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm" />
+    <span className="text-muted-foreground">High</span>
+  </div>
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm" />
+    <span className="text-muted-foreground">Mid</span>
+  </div>
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" />
+    <span className="text-muted-foreground">Weak</span>
+  </div>
+</div>
+        
       </div>
+      
     </ResizableWindow>
   );
 };

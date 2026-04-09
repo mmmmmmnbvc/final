@@ -13,8 +13,8 @@ interface DataTableProps {
   onClose: (id: string) => void;
 }
 
-const DEFAULT_POSITION = { x: 2010, y: 600 }; //
-const DEFAULT_SIZE = { width: 650, height: 580 };
+const DEFAULT_POSITION = { x: 1410, y: 450 }; //
+const DEFAULT_SIZE = { width: 450, height: 430 };
 
 export const DataTable = ({
   visible,
@@ -69,7 +69,7 @@ const handleDownloadRinex = useCallback(() => {
               <thead>
                 <tr className="bg-muted">
                   {Object.keys(rawData[0])
-                    .slice(0, 6)
+                    .slice(1, 5)
                     .map((key) => (
                       <th
                         key={key}
@@ -81,10 +81,10 @@ const handleDownloadRinex = useCallback(() => {
                 </tr>
               </thead>
               <tbody>
-                {rawData.slice(0,9).map((row, idx) => (
+                {rawData.slice(0,8).map((row, idx) => (
                   <tr key={idx} className="hover:bg-muted/50">
                     {Object.keys(row)
-                      .slice(0, 6)
+                      .slice(1, 5)
                       .map((key) => (
                         <td
                           key={key}
@@ -98,7 +98,7 @@ const handleDownloadRinex = useCallback(() => {
               </tbody>
             </table>
             <p className="mt-2 text-muted-foreground">
-              Showing 9 of {rawData.length} rows
+              Showing 5 of {rawData.length} rows
             </p>
             <button
               onClick={handleDownloadCSV}

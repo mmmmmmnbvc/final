@@ -14,8 +14,18 @@ interface SkyplotProps {
   satelliteCounts: { G: number; R: number; E: number };
 }
 
-const DEFAULT_POSITION = { x: 670, y: 0 };
-const DEFAULT_SIZE = { width: 650, height: 580 };
+ const DEFAULT_POSITION = { x: 470, y: 0 };
+ const DEFAULT_SIZE = { width: 450, height: 430 };
+
+// const DEFAULT_POSITION = {
+//   x: window.innerWidth * 0.35,
+//   y: window.innerHeight * 0,
+// };
+
+// const DEFAULT_SIZE = {
+//   width: window.innerWidth * 0.4,
+//   height: window.innerHeight * 0.6,
+// };
 
 export const Skyplot = ({
   visible,
@@ -168,6 +178,41 @@ export const Skyplot = ({
         </div>
 
         <div id="polarPlot" className="flex-1 w-full" />
+        {/* ✅ Legend แบบสรุป */}
+<div className="mt-2 flex gap-4 text-xl items-center">
+  
+  {/* G */}
+  <div className="flex justify-center items-center gap-6  text-xl tracking-wider">
+    <span
+      className="w-3 h-3 rounded-full"
+      style={{ backgroundColor: "#3B82F6" }}
+    />
+    <span className="text-muted-foreground">G-Satellite</span>
+  </div>
+
+  {/* R */}
+  <div className="flex items-center gap-2">
+    <span
+      className="w-3 h-3"
+      style={{ backgroundColor: "#EF4444" }}
+    />
+    <span className="text-muted-foreground" >R-Satellite</span>
+  </div>
+
+  {/* E */}
+  <div className="flex items-center gap-2">
+    <span
+      className="w-0 h-0"
+      style={{
+        borderLeft: "6px solid transparent",
+        borderRight: "6px solid transparent",
+        borderBottom: "10px solid #22C55E",
+      }}
+    />
+    <span className="text-muted-foreground" >E-Satellite</span>
+  </div>
+
+</div>
       </div>
     </ResizableWindow>
   );

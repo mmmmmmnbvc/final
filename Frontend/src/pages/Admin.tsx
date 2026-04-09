@@ -138,7 +138,15 @@ export default function Admin() {
       </Badge>
     );
   };
+   useEffect(() => {
+    // เปิด Light Mode ตอนเข้า page
+    document.documentElement.classList.add("station-light");
 
+    // ลบออกตอนออกจาก page (สำคัญมาก)
+    return () => {
+      document.documentElement.classList.remove("station-light");
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/20 to-background p-4 md:p-8">
       <div className="mx-auto max-w-8xl">{/*max-w-7xl*/}

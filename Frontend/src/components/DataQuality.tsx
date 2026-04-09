@@ -16,8 +16,8 @@ interface DataQualityProps {
   onToggleMinimize: (isMinimized: boolean) => void;
 }
 
-const DEFAULT_POSITION = { x: 1340, y: 600 };//1590
-const DEFAULT_SIZE = { width: 650, height: 580 };
+const DEFAULT_POSITION = { x: 940, y: 450 };//1590
+const DEFAULT_SIZE = { width: 450, height: 430 };
 
 export const DataQuality = ({
   visible,
@@ -158,20 +158,28 @@ return v >= 2000 ? "#22c55e" : v >= 1 ? "#eab308" : "#ef4444";
       marker: { color: colors },
     });
 
-    Plotly.react(
-      plotId,
-      traces,
-      {
-        barmode: "group",
-        paper_bgcolor: "rgba(0,0,0,0)",
-        plot_bgcolor: "rgba(0,0,0,0)",
-        margin: { t: 10, b: 40, l: 30, r: 10 },
-        showlegend: false,
-        yaxis: { showticklabels: true, fixedrange: true },
-        xaxis: { tickangle: -45 },
-      },
-      { responsive: true, displayModeBar: false }
-    );
+const isDOP = ["gdop", "pdop", "hdop", "vdop", "tdop"].includes(metric);
+const isDoppler = metric === "doppler";
+
+Plotly.react(
+  plotId,
+  traces,
+  {
+    barmode: "group",
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    margin: { t: 10, b: 40, l: 30, r: 10 },
+    showlegend: false,
+    yaxis: {
+      showticklabels: true,
+      fixedrange: true,
+      ...(isDOP && { range: [0, 10] }),       // ✅ DOP max 10
+      ...(isDoppler && { range: [-3000, 3000] }), // ✅ Doppler max 3000
+    },
+    xaxis: { tickangle: -45 },
+  },
+  { responsive: true, displayModeBar: false }
+);
   };
 
   useEffect(() => {
@@ -208,19 +216,13 @@ return v >= 2000 ? "#22c55e" : v >= 1 ? "#eab308" : "#ef4444";
           ].map((metric) => (
             <button
               key={metric}
-              onClick={() => {
-                drawMiniBar(
-                  "plot-dataerror",
-                  groups?.[selectedConstellation] || {},
-                  metric
-                );
-                onMetricChange(metric);
-              }}
-              className={`px-3 py-1 text-xl rounded-md border border-border ${
-                metricDataQuality === metric
-                  ? "bg-secondary text-primary"
-                  : "bg-secondary/60 text-primary hover:bg-secondary"
-              }`}
+onClick={() => onMetricChange(metric)}
+
+              className={`px-3 py-1 text-xl rounded-md border transition ${
+  metricDataQuality === metric
+    ? "bg-blue-500 text-white border-blue-500"
+    : "bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+}`}
             >
               {metric.toUpperCase()}
             </button>
@@ -230,15 +232,10 @@ return v >= 2000 ? "#22c55e" : v >= 1 ? "#eab308" : "#ef4444";
         <div className="mb-2">
           <select
             value={selectedConstellation}
-            onChange={(e) => {
-              const val = e.target.value as "G" | "R" | "E";
-              onConstellationChange(val);
-              drawMiniBar(
-                "plot-dataerror",
-                groups?.[val] || {},
-                metricDataQuality
-              );
-            }}
+onChange={(e) => {
+  const val = e.target.value as "G" | "R" | "E";
+  onConstellationChange(val);
+}}
             className="px-3 py-1 text-xl rounded-md border border-border bg-secondary text-primary"
           >
             <option value="G">G-Satellite</option>
@@ -247,7 +244,23 @@ return v >= 2000 ? "#22c55e" : v >= 1 ? "#eab308" : "#ef4444";
           </select>
         </div>
 
+
         <div id="plot-dataerror" className="flex-1 w-full" />
+
+<div className="flex justify-center items-center gap-6 mt-2 py-2 border-t border-border/50 text-xl font-medium uppercase tracking-wider">
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm" />
+    <span className="text-muted-foreground">High</span>
+  </div>
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm" />
+    <span className="text-muted-foreground">Mid</span>
+  </div>
+  <div className="flex items-center gap-1.5">
+    <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm" />
+    <span className="text-muted-foreground">Weak</span>
+  </div>
+</div>
       </div>
     </ResizableWindow>
   );
