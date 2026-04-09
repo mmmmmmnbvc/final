@@ -92,9 +92,9 @@
         return;
       }
 
-      setMessage({ type: "success", text: "Registration complete! Redirecting to Home..." });
+      setMessage({ type: "success", text: "Registration complete! Redirecting to Map..." });
 
-      setTimeout(() => navigate("/Home"), 1500);
+      setTimeout(() => navigate("/map"), 1500);
     };
 
     const passwordsMatch =

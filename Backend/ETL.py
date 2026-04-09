@@ -216,13 +216,13 @@ def process_file(file_path):
 def bulk_run(root_folder):
     files = list(Path(root_folder).rglob(f"*{SUPPORTED_EXT}"))
 
-    print(f"[FOUND] {len(files)} files - etl_gnss.py:219")
+    print(f" {len(files)} files")
 
     if not files:
         return
 
     workers = min(cpu_count(), len(files))
-    print(f"[USING {workers} CORES] - etl_gnss.py:225")
+    # print(f"[USING {workers} CORES] - etl_gnss.py:225")
 
     with Pool(workers) as p:
         p.map(process_file, [str(f) for f in files])

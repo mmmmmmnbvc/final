@@ -44,7 +44,7 @@ const Verify = () => {
                     } else {
                         setStatus('success');
                         setTimeout(() => {
-                            navigate('/Home'); 
+                            navigate('/map'); 
                         }, 3000);
                     }
                 } else {
@@ -77,10 +77,10 @@ const Verify = () => {
                     <Check className="h-10 w-10 text-green-500 mx-auto" />
                     <p className="text-lg text-foreground font-medium">Email Confirmed! 🎉</p>
                     <p className="text-sm text-muted-foreground">
-                        Welcome back, **{username}**. Redirecting you to the Home shortly...
+                        Welcome back, **{username}**. Redirecting you to the Map shortly...
                     </p>
-                    <Button onClick={() => navigate('/Home')} className="w-full mt-4">
-                        Go to Home Now
+                    <Button onClick={() => navigate('/map')} className="w-full mt-4">
+                        Go to Map Now
                     </Button>
                 </div>
             );
