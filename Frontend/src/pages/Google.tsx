@@ -58,17 +58,7 @@
       }
 
       // เช็กว่ามี email นี้อยู่ใน profiles แล้วหรือยัง
-      const { data: existingUser } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", formData.email)
-        .maybeSingle();
 
-      if (existingUser) {
-        setMessage({ type: "error", text: "This Google account is already registered!" });
-        setLoading(false);
-        return;
-      }
 
       // เพิ่ม/อัปเดตข้อมูลลง profiles ทันที
       const { error: upsertError } = await supabase.from("profiles").upsert(

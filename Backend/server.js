@@ -6,9 +6,11 @@ import uploadRouter from "./Upload.js";
 import { exec } from 'child_process';   // ✅ เพิ่ม
 const app = express();
 app.use(cors());
+const DAYS_PATH = path.join(process.cwd(), 'days');
+app.use("/days", express.static(DAYS_PATH));
 app.use("/api", uploadRouter);
 // 🔥 path ไปยัง frontend/public
-const FRONTEND_PUBLIC = path.join(process.cwd(), '../Frontend/public');
+const FRONTEND_PUBLIC = path.join(process.cwd(), '/days');
 const PYTHON_SCRIPT = path.join(process.cwd(), 'ETL.py'); // ✅ เพิ่ม
 
 // ============================
@@ -147,6 +149,7 @@ app.post('/api/create-folder', express.json(), (req, res) => {
     res.status(500).json({ error: 'create folder failed' });
   }
 });
+
 // ============================
 // 🚀 Start Server
 // ============================

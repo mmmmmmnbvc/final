@@ -32,17 +32,18 @@ const Register = () => {
     
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      status: "USER",
-      options: {
-        // เก็บ username เพื่อใช้ตอน Verify
-        data: { username: formData.username ,password: formData.password }, 
-        // บังคับ Redirect ไปหน้า Verify หลังยืนยันอีเมล
-        emailRedirectTo: REDIRECT_URL 
-      },
-    });
+const { error } = await supabase.auth.signUp({
+  email: formData.email,
+  password: formData.password,
+  options: {
+    data: { 
+      username: formData.username,
+      password: formData.password, // ✅ จะถูก insert ลง profiles
+      status: "USER"
+    },
+    emailRedirectTo: REDIRECT_URL
+  },
+});
 
     setLoading(false);
 

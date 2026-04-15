@@ -293,7 +293,7 @@ useEffect(() => {
     return;
   }
 
-      const csvPath = `/${selectedDay}/${station.MARKER_NAM}${selectedDay}${fileSuffix}.csv`;
+      const csvPath = `https://healthy-mainly-api-dice.trycloudflare.com/days/${selectedDay}/${station.MARKER_NAM}${selectedDay}${fileSuffix}.csv`;
 
       fetch(csvPath)
         .then((res) => {
