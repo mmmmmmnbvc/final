@@ -9,9 +9,12 @@ export interface FileItem {
   folder: string;
   url: string;
 }
+const BASE_URL = "https://gnss-backend-ksw2.onrender.com";
 
-const API = 'http://localhost:4000/api/files';
-const UPLOAD_API = 'http://localhost:4000/api/upload';
+const API = `${BASE_URL}/api/files`;
+const UPLOAD_API = `${BASE_URL}/api/upload`;
+// const API = 'http://localhost:4000/api/files';
+// const UPLOAD_API = 'http://localhost:4000/api/upload';
 export const useFileManager = () => {
   const [folders, setFolders] = useState<string[]>([]);
 const [filesInFolder, setFilesInFolder] = useState<FileItem[]>([]); 
@@ -19,7 +22,8 @@ const [filesInFolder, setFilesInFolder] = useState<FileItem[]>([]);
   const [currentFolder, setCurrentFolder] = useState('/');
 
 useEffect(() => {
-  fetch('http://localhost:4000/api/folders')
+  // fetch('http://localhost:4000/api/folders')
+  fetch(`${BASE_URL}/api/folders`)
     .then(res => res.json())
     .then(setFolders);
 }, []);
@@ -126,7 +130,8 @@ const createFolder = useCallback(async (name: string, root = false) => {
     ? "" 
     : currentFolder.replace(/\//g, '');
 
-  await fetch("http://localhost:4000/api/create-folder", {
+  // await fetch("http://localhost:4000/api/create-folder", {
+  fetch(`${BASE_URL}/api/create-folder`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

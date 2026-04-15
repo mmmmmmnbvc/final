@@ -78,7 +78,8 @@ const Updates = () => {
   size="sm"
   onClick={async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/convert", {
+      // const res = await fetch("http://localhost:4000/api/convert", {
+      const res = await fetch("https://gnss-backend-ksw2.onrender.com/api/convert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
