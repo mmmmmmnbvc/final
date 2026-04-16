@@ -20,23 +20,46 @@
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
     // ดึงข้อมูลผู้ใช้จาก Google OAuth
-    useEffect(() => {
-      const fetchUser = async () => {
-        const { data, error } = await supabase.auth.getUser();
-        if (error || !data.user) {
-          console.log("No user session from Google");
-          return;
-        }
-        const googleUser = data.user;
-        setFormData((prev) => ({
-          ...prev,
-          email: googleUser.email || "",
-          username: googleUser.user_metadata.full_name || "",
-        }));
-      };
-      fetchUser();
-    }, []);
+    // useEffect(() => {
+    //   const fetchUser = async () => {
+    //     const { data, error } = await supabase.auth.getUser();
+    //     if (error || !data.user) {
+    //       console.log("No user session from Google");
+    //       return;
+    //     }
+    //     const googleUser = data.user;
+    //     setFormData((prev) => ({
+    //       ...prev,
+    //       email: googleUser.email || "",
+    //       username: googleUser.user_metadata.full_name || "",
+    //     }));
+    //   };
+    //   fetchUser();
+    // }, []);
+useEffect(() => {
+  const fetchUser = async () => {
+    // ให้ Supabase อ่าน token จาก URL ก่อน
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
 
+    if (sessionError || !session?.user) {
+      console.log("No session found");
+      return;
+    }
+
+    const googleUser = session.user;
+
+    setFormData((prev) => ({
+      ...prev,
+      email: googleUser.email || "",
+      username: googleUser.user_metadata.full_name || "",
+    }));
+  };
+
+  fetchUser();
+}, []);
     // ฟังก์ชันเมื่อกด Create Account
     const handleRegister = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -50,13 +73,26 @@
       setLoading(true);
 
       // ดึง user ปัจจุบันจาก Google OAuth
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setMessage({ type: "error", text: "No authenticated user found!" });
-        setLoading(false);
-        return;
-      }
+      // const { data: { user } } = await supabase.auth.getUser();
+      // if (!user) {
+      //   setMessage({ type: "error", text: "No authenticated user found!" });
+      //   setLoading(false);
+      //   return;
+      // }
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 
+const user = session?.user;
+
+if (!user) {
+  setMessage({
+    type: "error",
+    text: "No authenticated user found!",
+  });
+  setLoading(false);
+  return;
+}
       // เช็กว่ามี email นี้อยู่ใน profiles แล้วหรือยัง
 
 
