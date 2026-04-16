@@ -60,21 +60,36 @@ const { error } = await supabase.auth.signUp({
     }
   };
 
-  const handleGoogleLogin = async () => {
+//   const handleGoogleLogin = async () => {
+//   try {
+//     const { error } = await supabase.auth.signInWithOAuth({
+//       provider: "google",
+//       options: {
+//         // redirectTo: "http://localhost:8080/google",
+//         redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+//       },
+//     });
+//     if (error) throw error;
+//   } catch (err: any) {
+//     alert(err.error_description || err.message);
+//   }
+// };
+const handleGoogleLogin = async () => {
   try {
+    const redirectUrl = `${window.location.origin}/google`;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // redirectTo: "http://localhost:8080/google",
-        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+        redirectTo: redirectUrl,
       },
     });
+
     if (error) throw error;
   } catch (err: any) {
     alert(err.error_description || err.message);
   }
 };
-
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 
     useEffect(() => {
