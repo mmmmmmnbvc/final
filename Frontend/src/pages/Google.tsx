@@ -37,16 +37,22 @@
     //   fetchUser();
     // }, []);
 useEffect(() => {
-const fetchUser = async () => {
-  // ⭐ สำคัญ: ให้มันอ่าน token จาก URL ก่อน
- 
+  const fetchUser = async () => {
+    // ⭐ แปลง token จาก URL → session
+    const { data, error } = await supabase.auth.exchangeCodeForSession(
+      window.location.href
+    );
 
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Exchange session error:", error);
+      return;
+    }
 
-    if (sessionError || !session?.user) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
       console.log("No session found");
       return;
     }
