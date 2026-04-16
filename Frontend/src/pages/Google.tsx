@@ -37,19 +37,10 @@
     //   fetchUser();
     // }, []);
 useEffect(() => {
-  const fetchUser = async () => {
-    // ⭐ แปลง token จาก URL → session
-    const { data, error } = await supabase.auth.exchangeCodeForSession(
-      window.location.href
-    );
-
-    if (error) {
-      console.error("Exchange session error:", error);
-      return;
-    }
-
+  const handleOAuth = async () => {
     const {
       data: { session },
+      error,
     } = await supabase.auth.getSession();
 
     if (!session?.user) {
@@ -57,16 +48,16 @@ useEffect(() => {
       return;
     }
 
-    const googleUser = session.user;
+    const user = session.user;
 
     setFormData((prev) => ({
       ...prev,
-      email: googleUser.email || "",
-      username: googleUser.user_metadata.full_name || "",
+      email: user.email || "",
+      username: user.user_metadata.full_name || "",
     }));
   };
 
-  fetchUser();
+  handleOAuth();
 }, []);
     // ฟังก์ชันเมื่อกด Create Account
     const handleRegister = async (e: React.FormEvent) => {
