@@ -9,8 +9,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 import { supabase } from "@/supabaseClient";
 
 import { useEffect } from "react";
-const REDIRECT_URL = 'http://localhost:8080/verify'; 
-
+// const REDIRECT_URL = 'http://localhost:8080/verify'; 
+const REDIRECT_URL = 'https://gnss-network-management-system-sigma.vercel.app/verify';
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -65,7 +65,8 @@ const { error } = await supabase.auth.signUp({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:8080/google",
+        // redirectTo: "http://localhost:8080/google",
+        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
       },
     });
     if (error) throw error;
