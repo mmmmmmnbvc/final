@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import { HashRouter } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Map from "./pages/Map";
 import Home from "./pages/Home";
@@ -42,7 +42,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             {/* <Route path="/" element={<Index />} /> */}
             <Route path="/Map" element={<Map />} />
@@ -61,7 +61,7 @@ const App = () => {
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
