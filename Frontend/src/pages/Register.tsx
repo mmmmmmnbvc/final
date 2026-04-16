@@ -60,29 +60,26 @@ const { error } = await supabase.auth.signUp({
     }
   };
 
-//   const handleGoogleLogin = async () => {
-//   try {
-//     const { error } = await supabase.auth.signInWithOAuth({
-//       provider: "google",
-//       options: {
-//         // redirectTo: "http://localhost:8080/google",
-//         redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
-//       },
-//     });
-//     if (error) throw error;
-//   } catch (err: any) {
-//     alert(err.error_description || err.message);
-//   }
-// };
+
 const handleGoogleLogin = async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
     },
   });
 
-  if (error) console.error(error);
+  if (error) {
+    console.error("OAuth Error:", error);
+    return;
+  }
+
+  if (data?.url) {
+    console.log("Redirecting to:", data.url);
+    window.location.href = data.url; // ⭐ ตัวนี้แหละที่ขาด
+  } else {
+    console.log("No URL returned");
+  }
 };
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 
