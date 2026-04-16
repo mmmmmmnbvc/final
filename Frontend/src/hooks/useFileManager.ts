@@ -9,7 +9,7 @@ export interface FileItem {
   folder: string;
   url: string;
 }
-const BASE_URL = "https://assessment-cute-configure-alphabetical.trycloudflare.com";
+const BASE_URL = "https://covered-telephone-editorials-sheep.trycloudflare.com";
 
 const API = `${BASE_URL}/api/files`;
 const UPLOAD_API = `${BASE_URL}/api/upload`;
