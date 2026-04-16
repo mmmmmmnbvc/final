@@ -75,18 +75,14 @@ const { error } = await supabase.auth.signUp({
 //   }
 // };
 const handleGoogleLogin = async () => {
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
-      },
-    });
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+    },
+  });
 
-    if (error) throw error;
-  } catch (err: any) {
-    alert(err.error_description || err.message);
-  }
+  if (error) console.error(error);
 };
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 

@@ -39,7 +39,7 @@
 useEffect(() => {
 const fetchUser = async () => {
   // ⭐ สำคัญ: ให้มันอ่าน token จาก URL ก่อน
-  await supabase.auth.exchangeCodeForSession(window.location.href);
+ 
 
   const {
     data: { session },

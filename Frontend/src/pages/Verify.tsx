@@ -13,51 +13,53 @@ const Verify = () => {
     const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
     const [username, setUsername] = useState('...');
 
-    useEffect(() => {
-        const checkUserAndVerify = async () => {
-            setLoading(true);
-            
-            // ตรวจสอบ Session ที่ Supabase สร้างไว้ให้หลังคลิกลิงก์
-            const { data: { user } } = await supabase.auth.getUser();
-            
+useEffect(() => {
+    const checkUserAndVerify = async () => {
+        setLoading(true);
 
-            //  user ยืนยันอีเมลสำเร็จแล้ว
-            if (user) {
-                const profileUsername = user.user_metadata.username; 
-                const profilePassword = user.user_metadata.password;
-                setUsername(profileUsername || 'User');
+        // ✅ STEP 1: แปลง token ใน URL → session
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession();
 
-                if (profileUsername && profilePassword) {
-                    const { error: updateError } = await supabase
-                        .from('profiles')
-                        .update({ 
-                            username: profileUsername,
-                            email: user.email, 
-                            password: profilePassword, 
-                            status: 'USER' 
-                        })
-                        .eq('id', user.id); 
-
-                    if (updateError) {
-                        console.error("Profile Update Error (Check RLS/Table Schema):", updateError);
-                        setStatus('error');
-                    } else {
-                        setStatus('success');
-                        setTimeout(() => {
-                            navigate('/map'); 
-                        }, 3000);
-                    }
-                } else {
-                    // ไม่เจอ username หรือ password
-                    console.error("Missing username or password");
-                    setStatus('error');
-                }
-            }
+        if (exchangeError) {
+            console.error("Exchange Error:", exchangeError);
+            setStatus("error");
             setLoading(false);
-        };
+            return;
+        }
 
-        checkUserAndVerify();
-    }, [navigate]);
+        // ✅ STEP 2: ค่อยดึง user
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            const profileUsername = user.user_metadata.username;
+
+            setUsername(profileUsername || 'User');
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ 
+                    username: profileUsername,
+                    email: user.email,
+                    status: 'USER'
+                })
+                .eq('id', user.id);
+
+            if (updateError) {
+                console.error(updateError);
+                setStatus('error');
+            } else {
+                setStatus('success');
+                setTimeout(() => navigate('/map'), 3000);
+            }
+        } else {
+            setStatus('error');
+        }
+
+        setLoading(false);
+    };
+
+    checkUserAndVerify();
+}, []);
 
 
     const renderContent = () => {
