@@ -9,7 +9,7 @@ export interface FileItem {
   folder: string;
   url: string;
 }
-const BASE_URL = "https://gnss-backend-ksw2.onrender.com";
+const BASE_URL = "https://assessment-cute-configure-alphabetical.trycloudflare.com";
 
 const API = `${BASE_URL}/api/files`;
 const UPLOAD_API = `${BASE_URL}/api/upload`;
@@ -32,7 +32,9 @@ useEffect(() => {
 useEffect(() => {
   if (!currentFolder) return;
 
-  const folder = currentFolder.replace(/\//g, '');
+  // const folder = currentFolder.replace(/\//g, '');
+  const folder = currentFolder.replace(/\//g, '') // หรือ default
+  if (!folder) return;
 
   fetch(`${API}?folder=${folder}`)
     .then(res => res.json())
@@ -136,10 +138,14 @@ const createFolder = useCallback(async (name: string, root = false) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      folder: folderPath,
-      name,
-    }),
+    // body: JSON.stringify({
+    //   folder: folderPath,
+    //   name,
+    // }),
+ body: JSON.stringify({
+  folder: currentFolder.replace(/^\//, ''),
+  name, // ✅ ต้องมี
+})
   });
 }, [currentFolder]);
 return {
