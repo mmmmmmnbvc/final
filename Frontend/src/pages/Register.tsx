@@ -76,14 +76,12 @@ const { error } = await supabase.auth.signUp({
 // };
 const handleGoogleLogin = async () => {
   try {
-    const redirectUrl = "https://gnss-network-management-system-sigma.vercel.app/google";
-
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: "google",
-  options: {
-    redirectTo: `${window.location.origin}/google`,
-  },
-});
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+      },
+    });
 
     if (error) throw error;
   } catch (err: any) {
