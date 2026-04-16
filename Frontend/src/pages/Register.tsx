@@ -65,20 +65,12 @@ const handleGoogleLogin = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/#/google"
+      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
     },
   });
 
-  if (error) {
-    console.error("OAuth Error:", error);
-    return;
-  }
-
   if (data?.url) {
-    console.log("Redirecting to:", data.url);
-    window.location.href = data.url; // ⭐ ตัวนี้แหละที่ขาด
-  } else {
-    console.log("No URL returned");
+    window.location.href = data.url;
   }
 };
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
