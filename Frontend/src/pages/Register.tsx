@@ -65,7 +65,7 @@ const handleGoogleLogin = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/Google",
+      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
     },
   });
 
