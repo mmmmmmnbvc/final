@@ -45,7 +45,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             {/* <Route path="/" element={<Index />} /> */}
-            <Route path="/Map" element={<Map />} />
+            <Route path="/map" element={<Map />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/google" element={<Google />} />
             <Route path="/Admin" element={<Admin />} />

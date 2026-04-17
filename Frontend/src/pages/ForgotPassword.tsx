@@ -40,7 +40,9 @@ const ForgotPassword = () => {
     setCooldown(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:8080/forgot-password",
+      // redirectTo: "http://localhost:8080/forgot-password",
+      // https://gnss-network-management-system-sigma.vercel.app/google
+      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/forgot-password",
     });
 
     if (error) {
