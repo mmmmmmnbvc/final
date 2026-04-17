@@ -79,7 +79,7 @@ const Updates = () => {
   onClick={async () => {
     try {
       // const res = await fetch("http://localhost:4000/api/convert", {
-      const res = await fetch("https://covered-telephone-editorials-sheep.trycloudflare.com/api/convert", {
+      const res = await fetch(" https://estates-somerset-fully-deck.trycloudflare.com/api/convert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

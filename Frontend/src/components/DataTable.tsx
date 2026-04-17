@@ -44,7 +44,7 @@ const handleDownloadRinex = useCallback(() => {
     return;
   }
 
-  const BASE_URL = "https://covered-telephone-editorials-sheep.trycloudflare.com";
+  const BASE_URL = " https://estates-somerset-fully-deck.trycloudflare.com";
 
   const fileName = `${stationName}${selectedDay}${fileSuffix}.25o`;
   const filePath = `${BASE_URL}/api/csv?folder=${selectedDay}&file=${fileName}`;
