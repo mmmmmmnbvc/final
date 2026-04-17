@@ -10,7 +10,8 @@ import { supabase } from "@/supabaseClient";
 
 import { useEffect } from "react";
 // const REDIRECT_URL = 'http://localhost:8080/verify'; 
-const REDIRECT_URL = 'https://gnss-network-management-system-sigma.vercel.app/verify';
+// https://gnss-network-management-system-sigma.vercel.app/register
+const REDIRECT_URL = 'https://gnss-network-management-system-sigma.vercel.app/verify'; 
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -32,18 +33,17 @@ const Register = () => {
     
     setLoading(true);
 
-const { error } = await supabase.auth.signUp({
-  email: formData.email,
-  password: formData.password,
-  options: {
-    data: { 
-      username: formData.username,
-      password: formData.password, // ✅ จะถูก insert ลง profiles
-      status: "USER"
-    },
-    emailRedirectTo: REDIRECT_URL
-  },
-});
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      status: "USER",
+      options: {
+        // เก็บ username เพื่อใช้ตอน Verify
+        data: { username: formData.username ,password: formData.password }, 
+        // บังคับ Redirect ไปหน้า Verify หลังยืนยันอีเมล
+        emailRedirectTo: REDIRECT_URL 
+      },
+    });
 
     setLoading(false);
 
@@ -60,19 +60,21 @@ const { error } = await supabase.auth.signUp({
     }
   };
 
-
-const handleGoogleLogin = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
-    },
-  });
-
-  if (data?.url) {
-    window.location.href = data.url;
+  const handleGoogleLogin = async () => {
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        // redirectTo: "http://localhost:8080/google",
+        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+      },
+    });
+    if (error) throw error;
+  } catch (err: any) {
+    alert(err.error_description || err.message);
   }
 };
+
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== "";
 
     useEffect(() => {
