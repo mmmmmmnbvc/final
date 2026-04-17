@@ -60,13 +60,12 @@ const Register = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+const handleGoogleLogin = async () => {
   try {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        // redirectTo: "http://localhost:8080/google",
-        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/google",
+        redirectTo: "https://gnss-network-management-system-sigma.vercel.app/"
       },
     });
     if (error) throw error;
