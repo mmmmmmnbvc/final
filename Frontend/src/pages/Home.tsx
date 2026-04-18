@@ -18,10 +18,10 @@ const Home = () => {
     }, []);
     const navigate = useNavigate();
 
-const handleLogout = () => {
-  sessionStorage.clear();
-  navigate("/Login");
-};
+// const handleLogout = () => {
+//   sessionStorage.clear();
+//   navigate("/Login");
+// };
   return (
     <div 
       className="min-h-screen relative"
@@ -45,12 +45,7 @@ const handleLogout = () => {
       style={{ height: '300px' }} 
     />
     
- <button
-    onClick={handleLogout}
-    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-  >
-    Logout
-  </button>
+
     <div className="flex items-center gap-3">
     </div>
 
@@ -58,7 +53,7 @@ const handleLogout = () => {
 </header>
     <main className="container mx-auto px-4 py-20">
       <div className="max-w-4xl mx-auto text-center space-y-8">
-        <div className="grid md:grid-cols-2  gap-6 pt-16">
+        <div className="grid md:grid-cols-2  gap-6 pt-16 ">
           {[
             
             // { icon: Map, title: "Real-time Maps", desc: "Interactive GNSS visualization", path: "/map" },
@@ -66,7 +61,13 @@ const handleLogout = () => {
             { icon: Database, title: "Database", desc: "แก้ไขข้อมูลโครงข่าย", path: "/Upload" },
           
             // { icon: Shield, title: "User Management", desc: "Manage users, permissions", path: "/Admin" }, lg:grid-cols-4
-          
+//           {
+//   icon: Shield,
+//   title: "Logout",
+//   desc: "ออกจากระบบ",
+//   path: "#",
+//   action: "logout"
+// },
             { icon: Zap, title: "Upload Data", desc: "อัปโหลดข้อมูลโครงข่าย", path: "/Updates" },
             
           ].map((feature, i) => (
@@ -75,7 +76,14 @@ const handleLogout = () => {
               key={i}
               to={feature.path} 
               className="bg-card/80 backdrop-blur-xl rounded-xl p-6 border border-primary/20 shadow-elevated hover:shadow-glow-soft transition-all hover:scale-105 block cursor-pointer" // 💡 เพิ่ม block และ cursor-pointer
+//             onClick={(e) => {
+//   if (feature.action === "logout") {
+//     e.preventDefault();
+//     handleLogout();
+//   }
+// }}
             >
+              
               <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4 mx-auto">
                 <feature.icon className="h-6 w-6 text-primary" />
               </div>
@@ -83,7 +91,14 @@ const handleLogout = () => {
               <p className="text-sm text-muted-foreground">{feature.desc}</p>
             </Link> 
   ))}
+  
 </div>
+ {/* <button
+    onClick={handleLogout}
+    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+  >
+    Logout
+  </button> */}
           </div>
         </main>
       </div>
