@@ -30,7 +30,8 @@ const Login = () => {
       }
 
       // บันทึก role ลง localStorage
-      localStorage.setItem("userStatus", data.status);
+      // localStorage.setItem("userStatus", data.status);
+      sessionStorage.setItem("userStatus", data.status);
 
       // ตรวจสถานะ (role)
       if (data.status === "ADMIN") {
