@@ -16,6 +16,7 @@ import markerIconNE01 from "../assets/markerNE01.png";
 import markerIconEE01 from "../assets/markerEE01.png";
 import markerIconSS01 from "../assets/markerSS01.png";
 import logo from "../assets/HIILogo_TH_EN-360x1271.png";
+import { LogoutButton } from "@/components/LogoutButton";
   const { Option } = Select;
 
   // Windy API
@@ -464,7 +465,7 @@ useEffect(() => {
   const script = document.createElement("script");
   script.id = "google-script";
   script.src =
-    "https://maps.googleapis.com/maps/api/js?key=AIzaSyBVB00cW8ZfAKFAyol9hYxMNO2Y5jFixBU&libraries=places";
+    "https://maps.googleapis.com/maps/api/js?key=AIzaSyD16A5ynQsidha-fglUQruvUKu7MLWjxco&libraries=places";
   script.async = true;
 
   script.onload = () => {
@@ -823,17 +824,12 @@ transition: "transform 0.4s ease, box-shadow 0.4s ease",
 
         {/*  Sidebar */}
         <div style={sidebarStyle}>
-          <h2
-            style={{
-              color: "#4B7BFF",
-              marginBottom: "16px",
-              fontWeight: "bold",
-              borderBottom: "1px solid rgba(255,255,255,0.15)",
-              paddingBottom: "8px",
-            }}
-          >
-            เมนูควบคุม
-          </h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.15)", paddingBottom: "8px" }}>
+            <h2 style={{ color: "#4B7BFF", margin: 0, fontWeight: "bold" }}>
+              เมนูควบคุม
+            </h2>
+            <LogoutButton variant="ghost" showText={false} className="text-white hover:bg-white/10" />
+          </div>
 
           <div
             style={{

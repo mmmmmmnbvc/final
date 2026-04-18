@@ -1,4 +1,5 @@
 import { Eye, EyeOff, RotateCcw, Sun, Moon } from "lucide-react";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface PanelVisibility {
   skyplot: boolean;
@@ -84,6 +85,8 @@ export const DashboardToolbar = ({
         <RotateCcw className="w-3 h-3" />
         Reset All
       </button>
+
+      <LogoutButton variant="secondary" showText={false} className="ml-2" />
     </div>
   );
 };

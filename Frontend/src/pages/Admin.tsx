@@ -28,6 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Check, X, Users, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface UserProfile {
   id: string;
@@ -151,12 +152,15 @@ export default function Admin() {
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/20 to-background p-4 md:p-8">
       <div className="mx-auto max-w-8xl">{/*max-w-7xl*/}
         
-        <div className="mb-8 text-center">
-          {/* <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
-            <Shield className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium text-primary">Admin</span>
-          </div> */}
-          <h1 className="mb-2 text-4xl font-bold tracking-tight">Manage Accounts</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            {/* <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <span className="text-sm font-medium text-primary">Admin</span>
+            </div> */}
+            <h1 className="mb-2 text-4xl font-bold tracking-tight">Manage Accounts</h1>
+          </div>
+          <LogoutButton variant="default" className="h-10" />
         </div>
 
         {/* Total Users Admin Accounts Staff Accounts User Accounts */}
