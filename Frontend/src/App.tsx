@@ -46,24 +46,29 @@ const App = () => {
           <Routes>
             {/* <Route path="/" element={<Index />} /> */}
             {/* <Route path="/map" element={<Map />} /> */}
-            <Route path="/map" element={ <Protected><Map /></Protected>}/>
+            {/* <Route path="/map" element={ <Protected><Map /></Protected>}/> */}
+            <Route path="/map" element={ <Protected allow={["USER"]}><Map /></Protected>}/>
             <Route path="/verify" element={<Verify />} />
             <Route path="/google" element={<Google />} />
             {/* <Route path="/Admin" element={<Admin />} /> */}
-            <Route path="/Admin" element={ <Protected><Admin /></Protected>}/>
+            <Route path="/Admin" element={ <Protected allow={["ADMIN"]}><Admin /></Protected>}/>
             {/* <Route path="/station/:stationCode" element={<Station />} /> */}
-            <Route path="/station/:stationCode" element={<Protected><Station /></Protected>} />
+            <Route path="/station/:stationCode" element={ <Protected allow={["USER"]}><Station /></Protected>}/>
+            {/* <Route path="/station/:stationCode" element={<Protected><Station /></Protected>} /> */}
             {/* <Route path="/Home" element={< Home />} /> */}
-            <Route path="/Home" element={ <Protected><Home /></Protected>}/>
+            <Route path="/Home" element={ <Protected allow={["STAFF"]}><Home /></Protected>}/>
+            {/* <Route path="/Home" element={ <Protected><Home /></Protected>}/> */}
             <Route path="/" element={<Login />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* <Route path="/Upload" element={<Upload />} /> */}
-            <Route path="/Upload" element={ <Protected><Upload /></Protected>}/>
+            <Route path="/Upload" element={ <Protected allow={["STAFF"]}><Upload /></Protected>}/>
+            {/* <Route path="/Upload" element={ <Protected><Upload /></Protected>}/> */}
             {/* <Route path="/Updates" element={<Updates />} /> */}
-            <Route path="/Updates" element={ <Protected><Updates /></Protected>}/>
+            <Route path="/Updates" element={ <Protected allow={["STAFF"]}><Updates /></Protected>}/>
+            {/* <Route path="/Updates" element={ <Protected><Updates /></Protected>}/> */}
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

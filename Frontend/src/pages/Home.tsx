@@ -5,7 +5,8 @@ import hiiLogo from "@/assets/hii-logo.png";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroBgs from "@/assets/1758772306473-removebg-preview.png";
 import { useEffect } from "react";
-const Index = () => {
+import { useNavigate } from "react-router-dom";
+const Home = () => {
     useEffect(() => {
       // เปิด Light Mode ตอนเข้า page
       document.documentElement.classList.add("station-light");
@@ -15,6 +16,12 @@ const Index = () => {
         document.documentElement.classList.remove("station-light");
       };
     }, []);
+    const navigate = useNavigate();
+
+const handleLogout = () => {
+  sessionStorage.clear();
+  navigate("/Login");
+};
   return (
     <div 
       className="min-h-screen relative"
@@ -38,7 +45,12 @@ const Index = () => {
       style={{ height: '300px' }} 
     />
     
- 
+ <button
+    onClick={handleLogout}
+    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+  >
+    Logout
+  </button>
     <div className="flex items-center gap-3">
     </div>
 
@@ -56,6 +68,7 @@ const Index = () => {
             // { icon: Shield, title: "User Management", desc: "Manage users, permissions", path: "/Admin" }, lg:grid-cols-4
           
             { icon: Zap, title: "Upload Data", desc: "อัปโหลดข้อมูลโครงข่าย", path: "/Updates" },
+            
           ].map((feature, i) => (
         
             <Link 
@@ -78,4 +91,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Home;

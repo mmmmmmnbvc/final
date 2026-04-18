@@ -31,6 +31,7 @@ const Login = () => {
 
       // บันทึก role ลง localStorage
       // localStorage.setItem("userStatus", data.status);
+      sessionStorage.clear();
       sessionStorage.setItem("userStatus", data.status);
 
       // ตรวจสถานะ (role)
