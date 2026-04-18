@@ -465,7 +465,7 @@ useEffect(() => {
   const script = document.createElement("script");
   script.id = "google-script";
   script.src =
-    "https://maps.googleapis.com/maps/api/js?key=AIzaSyD16A5ynQsidha-fglUQruvUKu7MLWjxco&libraries=places";
+    "https://maps.googleapis.com/maps/api/js?key=AIzaSyBVB00cW8ZfAKFAyol9hYxMNO2Y5jFixBU&libraries=places";
   script.async = true;
 
   script.onload = () => {
