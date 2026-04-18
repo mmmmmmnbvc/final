@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import Protected from "./pages/Protected";
 import NotFound from "./pages/NotFound";
 import Map from "./pages/Map";
 import Home from "./pages/Home";
@@ -45,19 +45,25 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             {/* <Route path="/" element={<Index />} /> */}
-            <Route path="/map" element={<Map />} />
+            {/* <Route path="/map" element={<Map />} /> */}
+            <Route path="/map" element={ <Protected><Map /></Protected>}/>
             <Route path="/verify" element={<Verify />} />
             <Route path="/google" element={<Google />} />
-            <Route path="/Admin" element={<Admin />} />
-            <Route path="/station/:stationCode" element={<Station />} />
+            {/* <Route path="/Admin" element={<Admin />} /> */}
+            <Route path="/Admin" element={ <Protected><Admin /></Protected>}/>
+            {/* <Route path="/station/:stationCode" element={<Station />} /> */}
+            <Route path="/station" element={ <Protected><Station /></Protected>}/>
             <Route path="/Home" element={< Home />} />
+            <Route path="/Home" element={ <Protected><Home /></Protected>}/>
             <Route path="/" element={<Login />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             <Route path="/Upload" element={<Upload />} />
+            <Route path="/Upload" element={ <Protected><Upload /></Protected>}/>
             <Route path="/Updates" element={<Updates />} />
+            <Route path="/Updates" element={ <Protected><Updates /></Protected>}/>
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
