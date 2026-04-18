@@ -52,17 +52,17 @@ const App = () => {
             {/* <Route path="/Admin" element={<Admin />} /> */}
             <Route path="/Admin" element={ <Protected><Admin /></Protected>}/>
             {/* <Route path="/station/:stationCode" element={<Station />} /> */}
-            <Route path="/station" element={ <Protected><Station /></Protected>}/>
-            <Route path="/Home" element={< Home />} />
+            <Route path="/station/:stationCode" element={<Protected><Station /></Protected>} />
+            {/* <Route path="/Home" element={< Home />} /> */}
             <Route path="/Home" element={ <Protected><Home /></Protected>}/>
             <Route path="/" element={<Login />} />
             <Route path="/Login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            <Route path="/Upload" element={<Upload />} />
+            {/* <Route path="/Upload" element={<Upload />} /> */}
             <Route path="/Upload" element={ <Protected><Upload /></Protected>}/>
-            <Route path="/Updates" element={<Updates />} />
+            {/* <Route path="/Updates" element={<Updates />} /> */}
             <Route path="/Updates" element={ <Protected><Updates /></Protected>}/>
             <Route path="/ResetPassword" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
