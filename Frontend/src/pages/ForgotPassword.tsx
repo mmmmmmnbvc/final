@@ -15,7 +15,7 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [cooldown, setCooldown] = useState(false);
 
-  // ✅ ตรวจว่าเข้ามาจากลิงก์ reset password จริง ๆ
+  //  ตรวจว่าเข้ามาจากลิงก์ reset password จริง ๆ
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -28,7 +28,7 @@ const ForgotPassword = () => {
     };
   }, []);
 
-  // ✅ ส่ง email reset password
+  //  ส่ง email reset password
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -51,11 +51,11 @@ const ForgotPassword = () => {
       setIsSubmitted(true);
     }
 
-    // ⏱ cooldown 60 วิ
+    //  cooldown 60 วิ
     setTimeout(() => setCooldown(false), 60000);
   };
 
-  // ✅ อัปเดตรหัสผ่านใหม่
+  // อัปเดตรหัสผ่านใหม่
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -75,7 +75,7 @@ const ForgotPassword = () => {
       return;
     }
 
-    // 🔥 sync กับ profiles (เพราะระบบคุณยังใช้ DB password)
+    //  sync กับ profiles ในdatabase
     if (user) {
       await supabase
         .from("profiles")
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
       // เปิด Light Mode ตอนเข้า page
       document.documentElement.classList.add("station-light");
 
-      // ลบออกตอนออกจาก page (สำคัญมาก)
+      // ลบออกตอนออกจาก page
       return () => {
         document.documentElement.classList.remove("station-light");
       };
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
               : "Reset Password"
           }
         >
-          {/* ================= RESET PASSWORD ================= */}
+          {/* RESET PASSWORD */}
           {isResetMode ? (
             <form onSubmit={handleUpdatePassword} className="space-y-5">
               <div className="text-center mb-6">
@@ -149,7 +149,7 @@ const ForgotPassword = () => {
 
           ) : !isSubmitted ? (
 
-            /* ================= REQUEST EMAIL ================= */
+            /* REQUEST EMAIL  */
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="text-center mb-6">
                 <p className="text-sm text-muted-foreground">
@@ -187,7 +187,7 @@ const ForgotPassword = () => {
 
           ) : (
 
-            /* ================= SUCCESS ================= */
+            /*  SUCCESS  */
             <div className="text-center space-y-6 py-4">
               <div className="flex justify-center">
                 <CheckCircle className="h-10 w-10 text-primary" />

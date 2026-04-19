@@ -85,7 +85,7 @@ const googleMarkersRef = React.useRef<any[]>([]);
       });
 
 const init = async () => {
-  // ✅ Leaflet 1.4.x (จำเป็นมาก)
+
   await loadScript("https://unpkg.com/leaflet@1.4.0/dist/leaflet.js");
 
   // (ไม่บังคับ แต่ควรมี)
@@ -96,7 +96,7 @@ const init = async () => {
     document.head.appendChild(link);
   }
 
-  // ✅ Windy
+  //  Windy
   await loadScript("https://api.windy.com/assets/map-forecast/libBoot.js");
 
   if (typeof window.windyInit !== "function") return;
@@ -115,7 +115,7 @@ window.windyInit(
     map.options.maxZoom = 20;
     map.options.minZoom = 3;
 
-    // ✅ แก้ปัญหา map ขนาดผิด
+    //  แก้ปัญหา map ขนาดผิด
     setTimeout(() => {
       map.invalidateSize();
     }, 1000);
@@ -131,7 +131,7 @@ window.windyInit(
     
   }, []);
 
-  /* ---------- MARKERS UPDATE ---------- */
+  /*  MARKERS UPDATE  */
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -199,7 +199,7 @@ const marker = L.marker([lat, lng], { icon })
 
       markersRef.current.push(marker);
 
-// ----- Google marker -----
+//  Google marker
 if (window._gmap && window.google) {
 const region = s.REGION?.trim().toUpperCase();
 
@@ -240,7 +240,7 @@ const pulseCircle = new window.google.maps.Circle({
   clickable: false,
 });
 
-// 🔥 Animation
+//  Animation กระพริบ
 let growing = true;
 let radius = 50;
 if (radius >= 200) growing = false;
@@ -339,7 +339,7 @@ useEffect(() => {
   pulseRefs.current.forEach((c) => c.remove());
   pulseRefs.current = [];
 
-  // แสดง pulse เฉพาะสถานีที่ส่งเข้ามา (ใกล้ที่สุด)
+  // แสดง pulse เฉพาะสถานีที่ ใกล้ที่สุด
 stations.forEach((s) => {
   const lat = parseFloat(String(s.LATITUDE));
   const lng = parseFloat(String(s.LONGITUDE));
@@ -496,12 +496,12 @@ useEffect(() => {
     window._gmap.setCenter({ lat, lng });
     window._gmap.setZoom(15);
 
-    // ✅ ลบ marker เก่าก่อน (ถ้ามี)
+    //  ลบ marker เก่าก่อน (ถ้ามี)
     if (window._searchMarker) {
       window._searchMarker.setMap(null);
     }
 
-    // ✅ สร้าง marker ใหม่ที่ตำแหน่งค้นหา
+    //  สร้าง marker ใหม่ที่ตำแหน่งค้นหา
     window._searchMarker = new window.google.maps.Marker({
       position: { lat, lng },
       map: window._gmap,
@@ -567,7 +567,6 @@ useEffect(() => {
 
   const minDist = withDistance[0].dist;
 
-  // ใกล้สุด + เผื่อใกล้มาก
   //ไม่าเกิน 0.5 km
   // return withDistance.filter((s) => s.dist <= minDist + 0.5);
   
@@ -756,70 +755,70 @@ transition: "transform 0.4s ease, box-shadow 0.4s ease",
         </style>
 
         {/*  Windy Map */}
-<WindyMap
-   stations={googlePos ? nearbyStations : searchedStations}
-   navigate={navigate}
-   focusPos={focusPos}
-/>
+  <WindyMap
+    stations={googlePos ? nearbyStations : searchedStations}
+    navigate={navigate}
+    focusPos={focusPos}
+  />
 
-<div
-  id="google-map"
-  style={{
-    position: "absolute",
-    inset: 0,
-    zIndex: 1,
-    display: "block",   // ✅ เปิด google ก่อน
-    width: "100%",
-    height: "100%",
-    visibility: "visible"
-  }}
-/>
-<div
-  style={{
-    position: "absolute",
-    bottom: "10px",
-    left: "278px",   // 🔥 ล่างซ้ายเหมือน Satellite
-    zIndex: 2000,
-  }}
->
-  <button
+  <div
+    id="google-map"
     style={{
-      padding: "8px 15px",
-      border: "none",
-      background: "#1E3A8A",
-      color: "white",
-      cursor: "pointer",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+      position: "absolute",
+      inset: 0,
+      zIndex: 1,
+      display: "block",   // ✅ เปิด google ก่อน
+      width: "100%",
+      height: "100%",
+      visibility: "visible"
     }}
-    onClick={() => {
-      const windy = document.getElementById("windy");
-      const google = document.getElementById("google-map");
-
-      if (!windy || !google) return;
-
-      if (google.style.visibility === "hidden") {
-        google.style.visibility = "visible";
-        google.style.pointerEvents = "auto";
-
-        windy.style.visibility = "hidden";
-        windy.style.pointerEvents = "none";
-      } else {
-        google.style.visibility = "hidden";
-        google.style.pointerEvents = "none";
-
-        windy.style.visibility = "visible";
-        windy.style.pointerEvents = "auto";
-
-        setTimeout(() => {
-          // @ts-ignore
-          window._windyMap?.invalidateSize?.();
-        }, 300);
-      }
+  />
+  <div
+    style={{
+      position: "absolute",
+      bottom: "10px",
+      left: "278px",   // 🔥 ล่างซ้ายเหมือน Satellite
+      zIndex: 2000,
     }}
   >
-    Switch Map
-  </button>
-</div>
+    <button
+      style={{
+        padding: "8px 15px",
+        border: "none",
+        background: "#1E3A8A",
+        color: "white",
+        cursor: "pointer",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+      }}
+      onClick={() => {
+        const windy = document.getElementById("windy");
+        const google = document.getElementById("google-map");
+
+        if (!windy || !google) return;
+
+        if (google.style.visibility === "hidden") {
+          google.style.visibility = "visible";
+          google.style.pointerEvents = "auto";
+
+          windy.style.visibility = "hidden";
+          windy.style.pointerEvents = "none";
+        } else {
+          google.style.visibility = "hidden";
+          google.style.pointerEvents = "none";
+
+          windy.style.visibility = "visible";
+          windy.style.pointerEvents = "auto";
+
+          setTimeout(() => {
+            // @ts-ignore
+            window._windyMap?.invalidateSize?.();
+          }, 300);
+        }
+      }}
+    >
+      Switch Map
+    </button>
+  </div>
         
 
         {/*  Sidebar */}
@@ -865,17 +864,17 @@ transition: "transform 0.4s ease, box-shadow 0.4s ease",
               placeholder="-- เลือกโครงข่าย (Region) --"
               style={{ width: "100%", marginBottom: "10px" }}
               value={selectedRegion || undefined}
-onChange={(value) => {
-  setSelectedRegion(value);
-  setSelectedStation("");
-setGooglePos(null);
-  if (value && regionConfig[value]) {
-    setFocusPos({
-      center: regionConfig[value].center,
-      zoom: regionConfig[value].zoom,
-    });
-  }
-}}
+              onChange={(value) => {
+                setSelectedRegion(value);
+                setSelectedStation("");
+              setGooglePos(null);
+                if (value && regionConfig[value]) {
+                  setFocusPos({
+                    center: regionConfig[value].center,
+                    zoom: regionConfig[value].zoom,
+                  });
+                }
+              }}
 
               getPopupContainer={(trigger) => trigger.parentNode as HTMLElement}
             >
@@ -895,19 +894,19 @@ setGooglePos(null);
                 style={{ width: "100%" }}
                 value={selectedStation || undefined}
                 onChange={(value) => {
-  setSelectedStation(value);
+                setSelectedStation(value);
 
-  const st = stations.find((s) => s.MARKER_NAM === value);
-  const lat = Number(st?.LATITUDE);
-const lng = Number(st?.LONGITUDE);
+                const st = stations.find((s) => s.MARKER_NAM === value);
+                const lat = Number(st?.LATITUDE);
+              const lng = Number(st?.LONGITUDE);
 
-if (Number.isFinite(lat) && Number.isFinite(lng)) {
-  setFocusPos({
-    center: [lat, lng],
-    zoom: 14,
-  });
-}
-}}
+              if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                setFocusPos({
+                  center: [lat, lng],
+                  zoom: 14,
+                });
+              }
+              }}
 
                 getPopupContainer={(trigger) => trigger.parentNode as HTMLElement}
               >

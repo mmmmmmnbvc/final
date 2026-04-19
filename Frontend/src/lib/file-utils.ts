@@ -65,12 +65,12 @@ export const formatFileSize = (bytes: number): string => {
 };
 
 export const getFileIcon = (type: string): string => {
-  if (type.startsWith('image/')) return '🖼️';
-  if (type.startsWith('video/')) return '🎬';
-  if (type.startsWith('audio/')) return '🎵';
-  if (type.includes('pdf')) return '📄';
-  if (type.includes('spreadsheet') || type.includes('excel')) return '📊';
-  if (type.includes('document') || type.includes('word')) return '📝';
-  if (type.includes('zip') || type.includes('archive')) return '📦';
+  if (type.startsWith('image/')) return '';
+  if (type.startsWith('video/')) return '';
+  if (type.startsWith('audio/')) return '';
+  if (type.includes('pdf')) return '';
+  if (type.includes('spreadsheet') || type.includes('excel')) return '';
+  if (type.includes('document') || type.includes('word')) return '';
+  if (type.includes('zip') || type.includes('archive')) return '';
   return '📎';
 };

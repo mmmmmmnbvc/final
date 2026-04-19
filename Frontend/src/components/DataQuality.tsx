@@ -31,9 +31,9 @@ export const DataQuality = ({
   onToggleMinimize,
 }: DataQualityProps) => {
 
-  // =========================
-  // ✅ FAKE DOP FROM SKYLOGIC
-  // =========================
+
+  //  FAKE DOP FROM SKYLOGIC
+
   const computeFakeDOP = (
     groupData: { [SV: string]: SvMetrics }
   ) => {
@@ -84,9 +84,8 @@ export const DataQuality = ({
     }
   };
 
-  // =========================
-  // 📊 DRAW BAR
-  // =========================
+  //  DRAW BAR
+ 
   const drawMiniBar = (
     plotId: string,
     groupData: { [SV: string]: SvMetrics },
@@ -129,7 +128,7 @@ export const DataQuality = ({
     // } else if (metric === "lock") {
     //   y = SVs.map((SV) => getValue(groupData[SV].lock));
     // } 
-    // ✅ DOP
+    //  DOP
     else if (["gdop", "pdop", "hdop", "vdop", "tdop"].includes(metric)) {
       const dop = computeFakeDOP(groupData);
 
@@ -173,8 +172,8 @@ Plotly.react(
     yaxis: {
       showticklabels: true,
       fixedrange: true,
-      ...(isDOP && { range: [0, 10] }),       // ✅ DOP max 10
-      ...(isDoppler && { range: [-3000, 3000] }), // ✅ Doppler max 3000
+      ...(isDOP && { range: [0, 10] }),       //  DOP max 10
+      ...(isDoppler && { range: [-3000, 3000] }), //  Doppler max 3000
     },
     xaxis: { tickangle: -45 },
   },

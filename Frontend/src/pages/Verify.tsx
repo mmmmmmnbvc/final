@@ -37,17 +37,17 @@ const Verify = () => {
                     //         status: 'USER' 
                     //     })
                     //     .eq('id', user.id); 
-const { error: updateError } = await supabase
-  .from('profiles')
-  .upsert([
-    {
-      id: user.id,
-      username: profileUsername,
-      email: user.email,
-      password: profilePassword,
-      status: 'USER',
-    },
-  ]);
+                    const { error: updateError } = await supabase
+                    .from('profiles')
+                    .upsert([
+                        {
+                        id: user.id,
+                        username: profileUsername,
+                        email: user.email,
+                        password: profilePassword,
+                        status: 'USER',
+                        },
+                    ]);
                     if (updateError) {
                         console.error("Profile Update Error (Check RLS/Table Schema):", updateError);
                         setStatus('error');

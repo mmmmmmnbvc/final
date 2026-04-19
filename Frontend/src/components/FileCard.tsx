@@ -45,8 +45,8 @@ const FileCard = forwardRef<HTMLAnchorElement, FileCardProps>(
         {/* Delete button */}
         <button
           onClick={(e) => {
-            e.preventDefault();   // ❌ ไม่ให้ download
-            e.stopPropagation();  // ❌ ไม่ให้ trigger <a>
+            e.preventDefault();   
+            e.stopPropagation();  
             onDelete(file.id);
           }}
           className="opacity-0 transition group-hover:opacity-100 text-destructive hover:text-destructive/80"

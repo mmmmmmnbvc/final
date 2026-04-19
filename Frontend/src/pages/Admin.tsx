@@ -143,7 +143,7 @@ export default function Admin() {
     // เปิด Light Mode ตอนเข้า page
     document.documentElement.classList.add("station-light");
 
-    // ลบออกตอนออกจาก page (สำคัญมาก)
+    // ลบออกตอนออกจาก page 
     return () => {
       document.documentElement.classList.remove("station-light");
     };

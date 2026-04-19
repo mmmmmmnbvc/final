@@ -9,7 +9,7 @@
     rawData: CsvRow[] | null;
     stationName?: string;
     fileSuffix: string;
-    selectedDay: string; // ✅ เพิ่ม
+    selectedDay: string; // 
     onClose: (id: string) => void;
   }
 

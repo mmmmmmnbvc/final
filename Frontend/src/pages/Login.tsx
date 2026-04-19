@@ -29,7 +29,7 @@ const Login = () => {
         return;
       }
 
-      // บันทึก role ลง localStorage
+      // บันทึก role ลง  sessionStorage
       // localStorage.setItem("userStatus", data.status);
       sessionStorage.clear();
       sessionStorage.setItem("userStatus", data.status);

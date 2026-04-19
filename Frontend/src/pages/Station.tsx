@@ -45,7 +45,7 @@ const [isCsvLoaded, setIsCsvLoaded] = useState(false);
   const [metricDataQuality, setMetricDataQuality] = useState("doppler")
    const [isPlaying, setIsPlaying] = useState(true);
   const canPlay = isPlaying && isCsvLoaded && !!uploadedData.raw;
-  // ✅ ADD ตรงนี้
+
 const [realTimePosition, setRealTimePosition] = useState<{
   lat: number;
   lon: number;
@@ -142,14 +142,14 @@ const [positionError, setPositionError] = useState<number | null>(null);
 
     const [h, m, s] = timeValue.split(":").map(Number);
 
-    // ✅ 1. เปลี่ยนไฟล์
+    //  1. เปลี่ยนไฟล์
     let hourIndex = h - 6;
     if (hourIndex < 0) hourIndex += 24;
 
     const suffix = timeOptions[hourIndex]?.suffix || "a";
     setFileSuffix(suffix);
 
-    // ✅ 2. ตั้งเวลาใหม่ให้ตรง (สำคัญมาก)
+    //  2. ตั้งเวลาใหม่ให้ตรง (สำคัญมาก)
     const newTime =
       `${h.toString().padStart(2, "0")}:` +
       `${m.toString().padStart(2, "0")}:` +
@@ -157,7 +157,7 @@ const [positionError, setPositionError] = useState<number | null>(null);
 
     setSelectedTime(newTime);  // 🔥 ตัวแก้หลัก
 
-    // ✅ 3. sync index กับเวลาในชั่วโมง
+    //  3. sync index กับเวลาในชั่วโมง
     setEpochIndex(m * 60 + s);
 
   }, [timeOptions]);
@@ -320,11 +320,11 @@ useEffect(() => {
   setIsPlaying(false); // (แนะนำ) หยุดเลย
 });
     }, [station, fileSuffix, selectedDay]);
-// ✅ position real time
+//  position real time
 useEffect(() => {
   if (!station) return;
 
-  // ✅ random offset (fake movement)
+  //  random offset (fake movement)
   const latOffset = (Math.random() - 0.5) * 0.0002;
   const lonOffset = (Math.random() - 0.5) * 0.0002;
   const heightOffset = (Math.random() - 0.5) * 2;
@@ -339,7 +339,7 @@ useEffect(() => {
     height: fakeHeight,
   });
 
-  // ✅ error คำนวณจาก offset (สมจริงขึ้น)
+  //  error คำนวณจาก offset 
   const error =
     Math.sqrt(latOffset ** 2 + lonOffset ** 2) * 111000; // meters
 
@@ -396,15 +396,13 @@ useEffect(() => {
             onToggleMinimize={(isMinimized) => {}}
             satelliteCounts={satelliteCounts}
           />
-
           {/* Station Info Window - Original */}
-          <ResizableWindow
-          
-            title={
-  <span className="text-xl font-bold">
-    Station: {station?.MARKER_NAM || "Loading..."}
-  </span>
-}
+          <ResizableWindow   
+          title={
+              <span className="text-xl font-bold">
+                Station: {station?.MARKER_NAM || "Loading..."}
+              </span>
+            }
             id="info"
             visible={visiblePanels.info}
             onClose={closePanel}
@@ -443,28 +441,28 @@ useEffect(() => {
                     {station?.ELL_Height || "-"}
                   </span>
                 </p>
-                {/* ✅ ADD ตรงนี้ */}
-<p>
-  <span className="font-medium text-muted-foreground">
-    Position Real-time:
-  </span>{" "}
-  <span className="text-foreground">
-    {realTimePosition
-      ? `${realTimePosition.lat.toFixed(6)}, ${realTimePosition.lon.toFixed(6)}`
-      : "-"}
-  </span>
-</p>
 
-<p>
-  <span className="font-medium text-muted-foreground">
-    Error:
-  </span>{" "}
-  <span className="text-foreground">
-    {positionError !== null
-      ? positionError.toFixed(6)
-      : "-"}
-  </span>
-</p>
+              <p>
+                <span className="font-medium text-muted-foreground">
+                  Position Real-time:
+                </span>{" "}
+                <span className="text-foreground">
+                  {realTimePosition
+                    ? `${realTimePosition.lat.toFixed(6)}, ${realTimePosition.lon.toFixed(6)}`
+                    : "-"}
+                </span>
+              </p>
+
+              <p>
+                <span className="font-medium text-muted-foreground">
+                  Error:
+                </span>{" "}
+                <span className="text-foreground">
+                  {positionError !== null
+                    ? positionError.toFixed(6)
+                    : "-"}
+                </span>
+              </p>
                 {station?.PROVINCE_TH && (
                   <p>
                     <span className="font-medium text-muted-foreground">
@@ -484,12 +482,12 @@ useEffect(() => {
                 <input
                   type="date"
                   className=" text-xl px-2 py-1  rounded border border-border bg-secondary text-primary"
-onChange={(e) => {
-  const date = new Date(e.target.value);
-  const day = getDayOfYear(date);
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      const day = getDayOfYear(date);
 
-  setSelectedDate(date);
-}}
+                      setSelectedDate(date);
+                    }}
                 />
               </div>
 

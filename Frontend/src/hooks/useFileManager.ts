@@ -32,7 +32,7 @@ useEffect(() => {
 useEffect(() => {
   if (!currentFolder) return;
 
-  // const folder = currentFolder.replace(/\//g, '');
+
   const folder = currentFolder.replace(/\//g, '') // หรือ default
   if (!folder) return;
 
@@ -58,9 +58,8 @@ useEffect(() => {
     });
 }, [currentFolder]);
 
-// ============================
-// 🗑️ ลบไฟล์เดียว (Backend + State)
-// ============================
+//  ลบไฟล์เดียว 
+
 const deleteFile = useCallback(async (id: string) => {
   const file = filesInFolder.find(f => f.id === id);
   if (!file) return;
@@ -76,9 +75,9 @@ const deleteFile = useCallback(async (id: string) => {
   setFilesInFolder(prev => prev.filter(f => f.id !== id));
 }, [filesInFolder, currentFolder]);
 
-// ============================
-// 🗑️ ลบไฟล์ทั้งหมดในโฟลเดอร์
-// ============================
+
+//  ลบไฟล์ทั้งหมดในโฟลเดอร์
+
 const deleteAll = useCallback(async () => {
   const folder = currentFolder.replace(/\//g, '');
 
@@ -92,9 +91,9 @@ const deleteAll = useCallback(async () => {
   setFilesInFolder([]);
 }, [filesInFolder, currentFolder]);
 
-// ============================
-// 📤 Upload file
-// ============================
+
+//  Upload file
+
 const addFiles = useCallback(async (files: File[]) => {
   const folder = currentFolder.replace(/\//g, '');
 
@@ -144,7 +143,7 @@ const createFolder = useCallback(async (name: string, root = false) => {
     // }),
  body: JSON.stringify({
   folder: currentFolder.replace(/^\//, ''),
-  name, // ✅ ต้องมี
+  name, 
 })
   });
 }, [currentFolder]);
@@ -154,8 +153,8 @@ return {
   currentFolder,
   setCurrentFolder,
   addFiles,
-  deleteFile,              // ✅ ใส่ของจริง
-  deleteAll,               // ✅ ใส่ของจริง
+  deleteFile,              
+  deleteAll,               
   createFolder,
 };
 

@@ -13,7 +13,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(true);
   const [isValid, setIsValid] = useState(false);
 
-  // ✅ ตรวจว่าเข้ามาจาก email reset จริง
+  //  ตรวจว่าเข้ามาจาก email reset จริง
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -27,7 +27,7 @@ const ResetPassword = () => {
     };
   }, []);
 
-  // ✅ update password
+  //  update password
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -47,7 +47,7 @@ const ResetPassword = () => {
       return;
     }
 
-    // 🔥 sync กับ profiles (ของคุณ)
+    //  sync กับ profiles (ของคุณ)
     if (user) {
       await supabase
         .from("profiles")
