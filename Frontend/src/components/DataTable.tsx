@@ -44,7 +44,7 @@ const handleDownloadRinex = useCallback(() => {
     return;
   }
 
-  const BASE_URL = "https://hiking-treated-elephant-lyrics.trycloudflare.com";
+  const BASE_URL = "https://lynn-directory-flow-walker.trycloudflare.com";
 
   const fileName = `${stationName}${selectedDay}${fileSuffix}.25o`;
   const filePath = `${BASE_URL}/api/csv?folder=${selectedDay}&file=${fileName}`;
